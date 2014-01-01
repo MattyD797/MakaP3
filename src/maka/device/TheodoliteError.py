@@ -1,0 +1,2 @@
+class TheodoliteError(Exception):
+    pass
