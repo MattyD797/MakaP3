@@ -7,7 +7,6 @@ from maka.format.SimpleDocumentFormat import (
     EDITING_NONE, FORMATTED_NONE, AngleFormat, DateFormat, DecimalFormat, FloatFormat,
     IntegerFormat, SimpleObservationFormat, StringFormat, TimeFormat)
 from maka.data.Observation import Observation
-import maka.format.SimpleDocumentFormat as SimpleDocumentFormat
 
 from MakaTests import TestCase
 
@@ -86,37 +85,6 @@ class Obs(Observation):
 class FormatTests(TestCase):
     
     
-    def testTokenizeObs(self):
-        
-        cases = [
-            ('   one two three   ', ['one', 'two', 'three']),
-            ('   "one"  two  "three"  ', ['"one"', 'two', '"three"']),
-            ('\"one\" \\ two "three"', ['"one"', '\\', 'two', '"three"']),
-            ('Station 1 "Old Ruins" Lat 20 4.925283850520 Lon -155 51.794984516976 El 65.6 MagDec 10:16:00',
-             ['Station', '1', '"Old Ruins"', 'Lat', '20', '4.925283850520', 'Lon',
-              '-155', '51.794984516976', 'El', '65.6', 'MagDec', '10:16:00'])
-        ]
-        
-        for input, expected in cases:
-            result = SimpleDocumentFormat._tokenizeObs(input)
-            self.assertEqual(result, expected)
-            
-            
-    def testBadObsStringTokenErrors(self):
-        
-        cases = [
-            'one "two ',            # unterminated string
-            '"',                    # unterminated string
-            '"\\"',                 # unterminated string
-            'one "two \\ three"',   # single backslash
-            '"one \\n two"',        # unrecognized escape
-            '"\\t"'                 # unrecognized escape
-        ]
-        
-        for case in cases:
-            self._assertRaises(ValueError, SimpleDocumentFormat._tokenizeObs, case)
-            
-            
     def _testFieldFormat(self, f, cases):
         self._testFieldFormatNone(f)
         for value, formattedValue in cases:

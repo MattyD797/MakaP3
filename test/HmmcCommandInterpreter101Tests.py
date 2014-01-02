@@ -19,7 +19,11 @@ class HmmcCommandInterpreter101Tests(TestCase):
             ('a12', ['a', '12']),
             ('a12 34', ['a', '12', '34']),
             ('12 34', ['12', '34']),
-            ('a1b 23', ['a1b', '23'])
+            ('a1b 23', ['a1b', '23']),
+            ('c "One"', ['c', '"One"']),
+            ('c "One Two"', ['c', '"One Two"']),
+            ('c 12 "One Two" 34', ['c', '12', '"One Two"', '34']),
+#            (r'c "String containing \\ and \""', ['c', '"String containing \\ and ""'])
         ]
         
         for command, tokens in cases:

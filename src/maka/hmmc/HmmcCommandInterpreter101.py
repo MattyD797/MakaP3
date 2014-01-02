@@ -1,6 +1,7 @@
 import re
 
 from maka.hmmc.HmmcDocument101 import Station
+import maka.util.TextUtils as TextUtils
 
 
 class HmmcCommandInterpreter101(object):
@@ -32,7 +33,7 @@ _compoundTokenRe = re.compile(r'^(\D+)(\d+)$')
 
 def _tokenizeCommand(command):
     
-    tokens = command.strip().split()
+    tokens = TextUtils.tokenizeString(command)
     
     if len(tokens) != 0:
         
