@@ -1,4 +1,4 @@
-from maka.hmmc.HmmcCommandInterpreter101 import HmmcCommandInterpreter101, _tokenizeCommand
+from maka.hmmc.HmmcCommandInterpreter101 import HmmcCommandInterpreter101
 
 from MakaTests import TestCase
 
@@ -6,6 +6,10 @@ from MakaTests import TestCase
 class HmmcCommandInterpreter101Tests(TestCase):
     
     
+    def setUp(self):
+        self.interpreter = HmmcCommandInterpreter101()
+        
+        
     def testCommandTokenization(self):
         
         cases = [
@@ -27,4 +31,4 @@ class HmmcCommandInterpreter101Tests(TestCase):
         ]
         
         for command, tokens in cases:
-            self.assertEqual(_tokenizeCommand(command), tokens)
+            self.assertEqual(self.interpreter._tokenizeCommand(command), tokens)

@@ -8,26 +8,14 @@ import re
 from maka.format.DocumentFormat import DocumentFormat
 from maka.format.FieldFormat import FieldFormat
 from maka.format.ObservationFormat import ObservationFormat
-import maka.util.TextUtils as TextUtils
+from maka.format.TokenUtils import NONE_TOKEN as FORMATTED_NONE
+import maka.format.TokenUtils as TokenUtils
 
 
 # TODO: Support more format customization, e.g. for dates, times, and angles.
 
 
-# `FORMATTED_NONE` is currently a pair of double quotes for compatibility with
-# Aardvark. However, I would like to switch to something else at some point.
-# The problem is that a pair of double quotes also represents the empty string,
-# so that we cannot distinguish between the formatted versions of the string
-# field values `''` and `None`. When we no longer need to use Aardvark we can
-# change the representation of `None` to something that allows us to make this
-# distinction, and modify the field parsers to support both the old and new kinds
-# of formatted `None`.
-# TODO: Change `FORMATTED_NONE` to something that allows us to distinguish
-# between formatted `None` values and formatted empty strings.
-FORMATTED_NONE = '""'
-'''The formatted value of an observation field value of `None`.'''
-
-EDITING_NONE = ''
+_EDITING_NONE = ''
 '''The formatted-for-editing value of an observation field value of `None`.'''
 
 
@@ -53,7 +41,7 @@ class StringFormat(FieldFormat):
     def format(self, v, editing=False):
         
         if editing:
-            return EDITING_NONE if v is None else v
+            return _EDITING_NONE if v is None else v
 
         elif v is None:
             return FORMATTED_NONE
@@ -68,13 +56,13 @@ class StringFormat(FieldFormat):
             return v
         
         else:
-            return '"' + v.replace('\\', '\\\\').replace('"', '\\"') + '"'
+            return '"' + _escapeString(v) + '"'
     
     
     def parse(self, s, editing=False):
         
         if editing:
-            return None if s == EDITING_NONE else s
+            return None if s == _EDITING_NONE else s
             
         elif s == FORMATTED_NONE:
             return None
@@ -83,7 +71,7 @@ class StringFormat(FieldFormat):
             # quoted string
             
             # We do not check the string contents here, assuming that happened during tokenization.
-            return s[1:-1].replace('\\\\', '\\').replace('\\"', '"')
+            return _unescapeString(s[1:-1])
         
         else:
             # unquoted string
@@ -91,6 +79,14 @@ class StringFormat(FieldFormat):
             return s
     
     
+def _escapeString(s):
+    return s.replace('\\', '\\\\').replace('"', '\\"')
+
+
+def _unescapeString(s):
+    return s.replace('\\\\', '\\').replace('\\"', '"')
+
+
 # TODO: Eliminate redundancy with expression in `Field` module.
 _DECIMAL_RE = re.compile(r'^-?(\d+\.?|\d*\.\d+)$')
 
@@ -105,7 +101,7 @@ class DecimalFormat(FieldFormat):
     def format(self, v, editing=False):
         
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         
         else:
             return v
@@ -113,7 +109,7 @@ class DecimalFormat(FieldFormat):
         
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -145,7 +141,7 @@ class IntegerFormat(FieldFormat):
     def format(self, v, editing=False):
         
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         
         else:
             return self.replacementField.format(v)
@@ -153,7 +149,7 @@ class IntegerFormat(FieldFormat):
     
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -180,14 +176,14 @@ class FloatFormat(FieldFormat):
         
     def format(self, v, editing=False):
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         else:
             return self.replacementField.format(v)
     
     
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -210,7 +206,7 @@ class AngleFormat(FieldFormat):
     def format(self, v, editing=False):
         
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         
         else:
             
@@ -233,7 +229,7 @@ class AngleFormat(FieldFormat):
         
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -263,14 +259,14 @@ class DateFormat(FieldFormat):
         
     def format(self, v, editing=False):
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         else:
             return '{:d}/{:d}/{:02d}'.format(v.month, v.day, v.year % 100)
         
         
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -314,14 +310,14 @@ class TimeFormat(FieldFormat):
         
     def format(self, v, editing=False):
         if v is None:
-            return EDITING_NONE if editing else FORMATTED_NONE
+            return _EDITING_NONE if editing else FORMATTED_NONE
         else:
             return '{:d}:{:02d}:{:02d}'.format(v.hour, v.minute, v.second)
         
         
     def parse(self, s, editing=False):
         
-        if editing and s == EDITING_NONE or not editing and s == FORMATTED_NONE:
+        if editing and s == _EDITING_NONE or not editing and s == FORMATTED_NONE:
             return None
         
         else:
@@ -411,7 +407,7 @@ class SimpleObservationFormat(ObservationFormat):
     
     
     def parseObservation(self, s):
-        return self._parseTokens(TextUtils.tokenizeString(s), s)
+        return self._parseTokens(TokenUtils.tokenizeString(s), s)
         
         
     def _parseTokens(self, tokens, s):
@@ -605,7 +601,7 @@ class SimpleDocumentFormat(DocumentFormat):
     
     def _parseObs(self, s):
         
-        tokens = TextUtils.tokenizeString(s)
+        tokens = TokenUtils.tokenizeString(s)
         n = len(tokens)
         
         for i, key_set in self._keySets:

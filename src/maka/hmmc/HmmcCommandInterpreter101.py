@@ -1,7 +1,13 @@
 import re
 
-from maka.hmmc.HmmcDocument101 import Station
-import maka.util.TextUtils as TextUtils
+from maka.hmmc.HmmcDocument101 import Station, TheoData
+import maka.format.TokenUtils as TokenUtils
+
+
+# TODO: Implement unquoted comments for HMMC?
+
+
+_compoundTokenRe = re.compile(r'^(\D+)(\d+)$')
 
 
 class HmmcCommandInterpreter101(object):
@@ -13,7 +19,7 @@ class HmmcCommandInterpreter101(object):
 
     def interpretCommand(self, command):
         
-        tokens = _tokenizeCommand(command)
+        tokens = self._tokenizeCommand(command)
         
         if len(tokens) == 0:
             return
@@ -28,21 +34,20 @@ class HmmcCommandInterpreter101(object):
             return cmd(*tokens[1:])
     
     
-_compoundTokenRe = re.compile(r'^(\D+)(\d+)$')
-
-
-def _tokenizeCommand(command):
-    
-    tokens = TextUtils.tokenizeString(command)
-    
-    if len(tokens) != 0:
+    def _tokenizeCommand(self, command):
         
-        m = _compoundTokenRe.match(tokens[0])
+        tokens = TokenUtils.tokenizeString(command)
         
-        if m is not None:
-            tokens = list(m.groups()) + tokens[1:]
-
-    return tokens            
+        # TODO: Offer the following only as an HMMC customization? It might be better for the
+        # default command parser to be simpler.
+        if len(tokens) != 0:
+            
+            m = _compoundTokenRe.match(tokens[0])
+            
+            if m is not None:
+                tokens = list(m.groups()) + tokens[1:]
+    
+        return tokens            
 
 
 class _SimpleCommand(object):
@@ -61,6 +66,7 @@ class _SimpleCommand(object):
     
     
 _commands = dict((c.cmdName, c) for c in [
+    _SimpleCommand('z arg', TheoData),
     _SimpleCommand(
         'station id name latitudeDegrees latitudeMinutes longitudeDegrees longitudeMinutes '
         'elevation magneticDeclination', Station)

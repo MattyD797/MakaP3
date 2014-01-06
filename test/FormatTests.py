@@ -3,12 +3,16 @@ from __future__ import print_function
 import datetime
 
 from maka.data.Field import Float, Integer, String
-from maka.format.SimpleDocumentFormat import (
-    EDITING_NONE, FORMATTED_NONE, AngleFormat, DateFormat, DecimalFormat, FloatFormat,
-    IntegerFormat, SimpleObservationFormat, StringFormat, TimeFormat)
 from maka.data.Observation import Observation
+from maka.format.SimpleDocumentFormat import (
+    AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleObservationFormat,
+    StringFormat, TimeFormat)
+from maka.format.TokenUtils import NONE_TOKEN as FORMATTED_NONE
 
 from MakaTests import TestCase
+
+
+_EDITING_NONE = ''
 
 
 _STRING_CASES = [
@@ -16,7 +20,10 @@ _STRING_CASES = [
     ('Hello, world!', '"Hello, world!"'),
     ('\\', '"\\\\"'),
     ('"', '"\\""'),
-    ('string with backslash \\ and quote "', '"string with backslash \\\\ and quote \\""')
+    ('\\"', '"\\\\\\""'),
+    ('"\\', '"\\"\\\\"'),
+    ('""', '"\\"\\""'),
+    ('"Hello \\ World!"', '"\\"Hello \\\\ World!\\""')
 ]
 
 
@@ -93,7 +100,7 @@ class FormatTests(TestCase):
             
             
     def _testFieldFormatNone(self, f):
-        self._testFieldFormatAux(f, [(None, False, FORMATTED_NONE), (None, True, EDITING_NONE)])
+        self._testFieldFormatAux(f, [(None, False, FORMATTED_NONE), (None, True, _EDITING_NONE)])
 
 
     def _testFieldFormatAux(self, f, cases):
@@ -115,7 +122,7 @@ class FormatTests(TestCase):
         
         
     def _testFieldParseNone(self, f):
-        self._testFieldParseAux(f, [(FORMATTED_NONE, False, None), (EDITING_NONE, True, None)])
+        self._testFieldParseAux(f, [(FORMATTED_NONE, False, None), (_EDITING_NONE, True, None)])
         
         
     def _testFieldParseAux(self, f, cases):
@@ -135,7 +142,7 @@ class FormatTests(TestCase):
             
             
     def _testFieldParseErrorsNone(self, f):
-        self._testFieldParseErrorsAux(f, [(FORMATTED_NONE, True), (EDITING_NONE, False)])
+        self._testFieldParseErrorsAux(f, [(FORMATTED_NONE, True), (_EDITING_NONE, False)])
         
         
     def _testFieldParseErrorsAux(self, f, cases):
