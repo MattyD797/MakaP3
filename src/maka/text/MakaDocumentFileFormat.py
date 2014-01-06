@@ -1,5 +1,5 @@
 from maka.data.Document import Document
-from maka.format.DocumentFileFormat import (
+from maka.text.DocumentFileFormat import (
     DocumentFileFormat, FileFormatError, UnrecognizedFileFormatError)
 import maka.util.ExtensionManager as ExtensionManager
 

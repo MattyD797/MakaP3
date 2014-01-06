@@ -4,10 +4,10 @@ import datetime
 
 from maka.data.Field import Float, Integer, String
 from maka.data.Observation import Observation
-from maka.format.SimpleDocumentFormat import (
+from maka.text.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleObservationFormat,
     StringFormat, TimeFormat)
-from maka.format.TokenUtils import NONE_TOKEN as FORMATTED_NONE
+from maka.text.TokenUtils import NONE_TOKEN as FORMATTED_NONE
 
 from MakaTests import TestCase
 

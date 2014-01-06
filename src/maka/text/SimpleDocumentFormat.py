@@ -5,11 +5,11 @@ import calendar
 import datetime
 import re
 
-from maka.format.DocumentFormat import DocumentFormat
-from maka.format.FieldFormat import FieldFormat
-from maka.format.ObservationFormat import ObservationFormat
-from maka.format.TokenUtils import NONE_TOKEN as FORMATTED_NONE
-import maka.format.TokenUtils as TokenUtils
+from maka.text.DocumentFormat import DocumentFormat
+from maka.text.FieldFormat import FieldFormat
+from maka.text.ObservationFormat import ObservationFormat
+from maka.text.TokenUtils import NONE_TOKEN as FORMATTED_NONE
+import maka.text.TokenUtils as TokenUtils
 
 
 # TODO: Support more format customization, e.g. for dates, times, and angles.

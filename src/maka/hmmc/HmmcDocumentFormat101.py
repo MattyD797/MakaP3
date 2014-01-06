@@ -1,10 +1,10 @@
 '''HMMC Maka field and observation formats.'''
 
 
-from maka.format.SimpleDocumentFormat import (
+from maka.hmmc.HmmcDocument101 import HmmcDocument101
+from maka.text.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleDocumentFormat,
     StringFormat, TimeFormat)
-from maka.hmmc.HmmcDocument101 import HmmcDocument101
 
 
 def _ndt(s):

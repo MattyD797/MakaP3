@@ -1,4 +1,4 @@
-from maka.format.DocumentFormat import DocumentFormat
+from maka.text.DocumentFormat import DocumentFormat
 
 
 class ReprDocumentFormat(DocumentFormat):

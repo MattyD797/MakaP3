@@ -35,7 +35,7 @@ from PySide.QtGui import (
 from maka.data.Document import Document
 from maka.ui.ObservationDialog import ObservationDialog
 from maka.util.Preferences import preferences as prefs
-import maka.format.DocumentFileFormat as DocumentFileFormat
+import maka.text.DocumentFileFormat as DocumentFileFormat
 import maka.util.ExtensionManager as ExtensionManager
  
  

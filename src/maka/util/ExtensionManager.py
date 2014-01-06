@@ -27,7 +27,7 @@ Perhaps every extension class should be a subclass of an `Extension` class.
 
 def initialize():
     
-    from maka.format.MakaDocumentFileFormat import MakaDocumentFileFormat
+    from maka.text.MakaDocumentFileFormat import MakaDocumentFileFormat
     _addExtensions('DocumentFileFormat', [MakaDocumentFileFormat])
     
     '''

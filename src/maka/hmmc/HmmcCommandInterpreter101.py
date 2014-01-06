@@ -1,7 +1,7 @@
 import re
 
 from maka.hmmc.HmmcDocument101 import Station, TheoData
-import maka.format.TokenUtils as TokenUtils
+import maka.text.TokenUtils as TokenUtils
 
 
 # TODO: Implement unquoted comments for HMMC?
