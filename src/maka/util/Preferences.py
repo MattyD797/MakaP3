@@ -15,7 +15,8 @@ def _loadPreferences():
 {
      "mainWindow.width": 600,
      "mainWindow.height": 500,
-     "observationDialog.width": 400
+     "observationDialog.width": 400,
+     "defaultDocumentFilePath": "/Users/Harold/Desktop/Maka/Test Document.txt"
 }
 ''')
         
