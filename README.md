@@ -7,4 +7,4 @@ Maka is simple, configurable software for the efficient collection of textual an
 
 You collect data with Maka by typing commands that are expanded into observations that are added to the current *document*. A document is a list of observations, displayed as text with one observation per line. The observations of a document can be edited individually, or groups of them can be cut, copied, and pasted. Whenever you edit an observation, Maka ensures that your modifications conform to the defined observation syntax, protecting the integrity of your data and simplifying subsequent data processing.
 
-To install Maka, see the [installation instructions](https://github.com/HaroldMills/Maka.wiki.git).
+To install Maka, see the [installation instructions](https://github.com/HaroldMills/Maka/wiki/Installation).
