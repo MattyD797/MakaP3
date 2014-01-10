@@ -18,9 +18,9 @@ def _loadPreferences():
     "defaultDocumentFilePath": "/Users/Harold/Desktop/Stuff/Maka/Test Document.txt",
     "devices": {
         "Theodolite": {
-            "deviceType": "Dummy Theodolite"
-#             "deviceType": "Sokkia DT500 Theodolite",
-#             "deviceConfig": { "serialPortName": "/dev/cu.usbserial" }
+#            "deviceType": "Dummy Theodolite"
+             "deviceType": "Sokkia DT500 Theodolite",
+             "deviceConfig": { "serialPortName": "/dev/cu.usbserial" }
         }
     }
 }
