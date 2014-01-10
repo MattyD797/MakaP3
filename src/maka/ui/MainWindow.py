@@ -559,7 +559,8 @@ def _getCommandInterpreter(doc):
     for cls in ExtensionManager.getExtensions('CommandInterpreter'):
         if docFormatName in cls.documentFormatNames:
             return cls()
-    # TODO: Raise and handle exception if interpreter not found.
+    raise ValueError(
+        'Command interpreter not found for document format "{:s}".'.format(docFormatName))
 
 
 class ObservationListWidget(QListWidget):
