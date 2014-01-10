@@ -22,3 +22,15 @@ class TextUtilsTests(TestCase):
         
         for s, r in cases:
             self.assertEqual(TextUtils.splitCamelCaseString(s), r)
+            
+            
+    def testRemoveComments(self):
+        
+        cases = [
+            ('one\n#two\nthree\n', 'one\nthree\n'),
+            ('\none\ntwo\n  #three\n#\n    five\n#six', '\none\ntwo\n    five\n')
+        ]
+        
+        for s, r in cases:
+            self.assertEqual(TextUtils.removeComments(s), r)
+            

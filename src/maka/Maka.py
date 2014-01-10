@@ -7,12 +7,9 @@ import sys
     
 from maka.ui.MainWindow import MainWindow
 from maka.util.Preferences import preferences as prefs
-import maka.util.ExtensionManager as ExtensionManager
 
 
 def _main():
-    
-    ExtensionManager.initialize()
     
     app = QApplication(sys.argv)
     

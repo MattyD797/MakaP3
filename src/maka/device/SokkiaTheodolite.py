@@ -242,7 +242,9 @@ class SokkiaTheodolite(object):
 
 class SokkiaDt4Theodolite(SokkiaTheodolite):
     
-    def __init__(self, serialPortName, readTimeout=3, writeTimeout=3):
+    extensionName = 'Sokkia DT4 Theodolite'
+    
+    def __init__(self, serialPortName=None, readTimeout=3, writeTimeout=3):
         
         super(SokkiaDt4Theodolite, self).__init__(
             serialPortName=serialPortName,
@@ -258,9 +260,11 @@ class SokkiaDt4Theodolite(SokkiaTheodolite):
     
 class SokkiaDt500Theodolite(SokkiaTheodolite):
     
-    def __init__(self, serialPortName, readTimeout=3, writeTimeout=3):
+    extensionName = 'Sokkia DT500 Theodolite'
+    
+    def __init__(self, serialPortName=None, readTimeout=3, writeTimeout=3):
         
-        super(SokkiaDt4Theodolite, self).__init__(
+        super(SokkiaDt500Theodolite, self).__init__(
             serialPortName=serialPortName,
             baudRate=1200,
             numDataBits=8,

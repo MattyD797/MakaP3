@@ -1,6 +1,9 @@
+import datetime
 import re
 
 from maka.hmmc.HmmcDocument101 import Station, TheoData
+from maka.text.CommandInterpreterError import CommandInterpreterError
+import maka.device.DeviceManager as DeviceManager
 import maka.text.TokenUtils as TokenUtils
 
 
@@ -17,6 +20,18 @@ class HmmcCommandInterpreter101(object):
     documentFormatNames = frozenset(('HMMC Document Format 1.01', "'96 MMRP Grammar 1.01"))
 
 
+    def __init__(self):
+        super(HmmcCommandInterpreter101, self).__init__()
+        self._theodolite = None
+        
+        
+    @property
+    def theodolite(self):
+        if self._theodolite is None:
+            self._theodolite = DeviceManager.getDevice('Theodolite')
+        return self._theodolite
+    
+    
     def interpretCommand(self, command):
         
         tokens = self._tokenizeCommand(command)
@@ -28,10 +43,10 @@ class HmmcCommandInterpreter101(object):
             cmd = _commands[tokens[0]]
             
         except KeyError:
-            raise # TODO: Handle this.
+            raise CommandInterpreterError('Unrecognized command "{:s}".'.format(tokens[0]))
         
         else:
-            return cmd(*tokens[1:])
+            return cmd(tokens[1:], self)
     
     
     def _tokenizeCommand(self, command):
@@ -50,24 +65,56 @@ class HmmcCommandInterpreter101(object):
         return tokens            
 
 
-class _SimpleCommand(object):
+class _Command(object):
+    
     
     def __init__(self, template, obsClass):
+        
+        super(_Command, self).__init__()
         
         parts = template.split()
         self.cmdName = parts[0]
         self.paramNames = parts[1:]
+        
         self.obsClass = obsClass
         
-    def __call__(self, *args):
+        
+    def __call__(self, args, interpreter):
         # Construct dictionary mapping field names to values.
         # Construct and return observation.
         print(self.cmdName, args)
     
     
+class _TheoDataCommand(_Command):
+    
+    
+    def __init__(self):
+        super(_TheoDataCommand, self).__init__('z', TheoData)
+        
+        
+    def __call__(self, args, interpreter):
+        
+        date, time = _getCurrentDateAndTime()
+        
+        theodolite = interpreter.theodolite
+        
+        try:
+            declination, azimuth = theodolite.readAngles()
+        except Exception as e:
+            raise CommandInterpreterError('Theodolite read failed. ' + str(e))
+        
+        return self.obsClass(
+            observationNum=0, date=date, time=time, declination=declination, azimuth=azimuth)
+    
+        
+def _getCurrentDateAndTime():
+    dt = datetime.datetime.now()
+    return (dt.date(), dt.time())
+
+
 _commands = dict((c.cmdName, c) for c in [
-    _SimpleCommand('z arg', TheoData),
-    _SimpleCommand(
+    _TheoDataCommand(),
+    _Command(
         'station id name latitudeDegrees latitudeMinutes longitudeDegrees longitudeMinutes '
         'elevation magneticDeclination', Station)
 ])

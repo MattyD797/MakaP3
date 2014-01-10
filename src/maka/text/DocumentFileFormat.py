@@ -15,10 +15,8 @@ def getDocumentFileFormat(filePath):
     
 def _processFile(filePath, function):
     
-    formats = ExtensionManager.extensions['DocumentFileFormat']
-    
     # TODO: Make file format extensions singletons, so we don't have to keep re-instantiating them.
-    for formatClass in formats.itervalues():
+    for formatClass in ExtensionManager.getExtensions('DocumentFileFormat'):
         format = formatClass()
         if format.isFileRecognized(filePath):
             return function(format)

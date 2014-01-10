@@ -107,10 +107,8 @@ TEMP_FILE_PATH = '/Users/Harold/Desktop/Temp.txt'
 
 def main():
     
-    ExtensionManager.initialize()
-    extensions = ExtensionManager.extensions
-    fileFormat = extensions['DocumentFileFormat']['Maka Document File Format']()
-    docFormat = extensions['DocumentFormat']['HMMC Document Format 1.01']()
+    fileFormat = ExtensionManager.getExtension('DocumentFileFormat', 'Maka Document File Format')()
+    docFormat = ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')()
 
     for dirPath, _, fileNames in os.walk(HMMC_DATA_DIR_PATH):
         

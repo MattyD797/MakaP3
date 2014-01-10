@@ -1,27 +1,6 @@
 '''Module containing `MainWindow` class.'''
 
 
-# Copyright (c) 2013 Harold Mills
-# 
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-
-
 from __future__ import print_function
 
 import os.path
@@ -33,6 +12,7 @@ from PySide.QtGui import (
     QMenuBar, QMessageBox, QVBoxLayout, QWidget)
 
 from maka.data.Document import Document
+from maka.text.CommandInterpreterError import CommandInterpreterError
 from maka.ui.ObservationDialog import ObservationDialog
 from maka.util.Preferences import preferences as prefs
 import maka.text.DocumentFileFormat as DocumentFileFormat
@@ -47,6 +27,7 @@ RESUME
 * Unsaved data quit dialog.
 * Auto-save
 * Reminders
+* Reduction
 * Find/Replace
 * Multiple documents.
 '''
@@ -204,9 +185,28 @@ class MainWindow(QMainWindow):
         return widget
         
         
+    # TODO: When observation list has keyboard focus and the user pressed a non-control
+    # key, shift focus to command line and deliver key press event to it.
+    
+    
     def _onCommandLineReturnPressed(self):
+        
         command = self._commandLine.text()
-        self._commandInterpreter.interpretCommand(command)
+        
+        try:
+            obs = self._commandInterpreter.interpretCommand(command)
+            
+        except CommandInterpreterError as e:
+            QMessageBox.critical(self, '', str(e))
+        
+        else:
+            
+            editName = 'Append ' + obs.__class__.__name__
+            index = self._obsList.count()
+            self.document.edit(editName, index, index, [obs])
+            
+            self._commandLine.clear()
+            self._obsList.scrollToItem(self._obsList.item(index))
         
         
     def _createObsList(self):
@@ -238,7 +238,7 @@ class MainWindow(QMainWindow):
             if len(changes) != 0:
                 
                 # TODO: Is this the best way to get the name of an observation type?
-                editName = obs.__class__.__name__ + ' Edit'
+                editName = 'Edit ' + obs.__class__.__name__
                 
                 document.edit(editName, index, index + 1, [obs.copy(**changes)])
                 
@@ -272,8 +272,7 @@ class MainWindow(QMainWindow):
     def _onDocumentEdit(self, edit):
         self._deleteObservations(edit.startIndex, edit.endIndex)
         self._insertObservations(edit.startIndex, len(edit.newObservations))
-        self._updateWindowTitle()
-        self._updateMenuItemStates()
+        self._updateUi()
         
         
     def _deleteObservations(self, startIndex, endIndex):
@@ -377,7 +376,7 @@ class MainWindow(QMainWindow):
             doc = DocumentFileFormat.readDocument(filePath)
             
         except Exception, e:
-            message = 'File open failed.\n\nError message was:\n\n' + str(e)
+            message = 'File open failed.\n\n' + str(e)
             QMessageBox.critical(self, '', message)
             
         else:
@@ -404,7 +403,7 @@ class MainWindow(QMainWindow):
             doc.fileFormat.writeDocument(doc, filePath, doc.documentFormat)
             
         except Exception, e:
-            message = 'File save failed.\n\nError message was:\n\n' + str(e)
+            message = 'File save failed.\n\n' + str(e)
             QMessageBox.critical(self, '', message)
             
         else:
@@ -547,18 +546,17 @@ def _createNewDocument():
 
 # TODO: Don't hard code default document format name.
 def _getDefaultDocumentFormat():
-    return ExtensionManager.extensions['DocumentFormat']['HMMC Document Format 1.01']
+    return ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')
 
 
 # TODO: Don't hard code default document file format name.
 def _getDefaultDocumentFileFormat():
-    return ExtensionManager.extensions['DocumentFileFormat']['Maka Document File Format']
+    return ExtensionManager.getExtension('DocumentFileFormat', 'Maka Document File Format')
 
 
 def _getCommandInterpreter(doc):
     docFormatName = doc.documentFormat.extensionName
-    classes = ExtensionManager.extensions['CommandInterpreter'].values()
-    for cls in classes:
+    for cls in ExtensionManager.getExtensions('CommandInterpreter'):
         if docFormatName in cls.documentFormatNames:
             return cls()
     # TODO: Raise and handle exception if interpreter not found.

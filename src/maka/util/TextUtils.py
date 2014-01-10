@@ -18,4 +18,8 @@ def splitCamelCaseString(s):
         j += 1
             
     return parts
-        
+
+
+def removeComments(s):
+    result = ''.join(line for line in s.splitlines(True) if not line.lstrip().startswith('#'))
+    return result

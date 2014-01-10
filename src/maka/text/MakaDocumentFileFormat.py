@@ -129,12 +129,16 @@ def _getDocFormatAux(name, messagePrefix, lineNum, filePath):
 
 
 def _getExtension(typeName, extensionName, description, lineNum, filePath):
-    try:
-        return ExtensionManager.extensions[typeName][extensionName]
-    except KeyError:
+    
+    extension = ExtensionManager.getExtension(typeName, extensionName)
+    
+    if extension is None:
         raise ValueError(
             'Unknown {:s} "{:s}" specified at line {:d} of Maka data file "{:s}".'.format(
                 description, extensionName, lineNum, filePath))
+        
+    else:
+        return extension
 
 
 def _writeHeader(file, docFormat):

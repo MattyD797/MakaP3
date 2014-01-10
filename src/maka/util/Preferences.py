@@ -1,24 +1,30 @@
 '''Module containing Maka preferences.'''
 
 
-# Copyright (C) 2013 Harold Mills. All rights reserved.
-
-
 from __future__ import print_function
 import json
+
+import maka.util.TextUtils as TextUtils
         
             
 def _loadPreferences():
     
     try:
-        return json.loads('''
+        return json.loads(TextUtils.removeComments('''
 {
-     "mainWindow.width": 600,
-     "mainWindow.height": 500,
-     "observationDialog.width": 400,
-     "defaultDocumentFilePath": "/Users/Harold/Desktop/Maka/Test Document.txt"
+    "mainWindow.width": 600,
+    "mainWindow.height": 500,
+    "observationDialog.width": 400,
+    "defaultDocumentFilePath": "/Users/Harold/Desktop/Stuff/Maka/Test Document.txt",
+    "devices": {
+        "Theodolite": {
+            "deviceType": "Dummy Theodolite"
+#             "deviceType": "Sokkia DT500 Theodolite",
+#             "deviceConfig": { "serialPortName": "/dev/cu.usbserial" }
+        }
+    }
 }
-''')
+'''))
         
     except ValueError:
         print('Could not parse preferences file.')
