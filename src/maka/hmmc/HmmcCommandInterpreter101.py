@@ -1,8 +1,11 @@
+from __future__ import print_function
+
 import datetime
 import re
 
 from maka.hmmc.HmmcDocument101 import Station, TheoData
 from maka.text.CommandInterpreterError import CommandInterpreterError
+from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
 import maka.text.TokenUtils as TokenUtils
 
@@ -20,8 +23,9 @@ class HmmcCommandInterpreter101(object):
     documentFormatNames = frozenset(('HMMC Document Format 1.01', "'96 MMRP Grammar 1.01"))
 
 
-    def __init__(self):
+    def __init__(self, doc):
         super(HmmcCommandInterpreter101, self).__init__()
+        self.obsNumGenerator = _createObsNumGenerator(doc)
         self._theodolite = None
         
         
@@ -65,6 +69,23 @@ class HmmcCommandInterpreter101(object):
         return tokens            
 
 
+def _createObsNumGenerator(doc):
+    
+    maxObsNum = -1
+    
+    for obs in doc.observations:
+        
+        try:
+            obsNum = getattr(obs, 'observationNum')
+        except AttributeError:
+            continue
+        
+        if obsNum > maxObsNum:
+            maxObsNum = obsNum
+            
+    return SerialNumberGenerator(maxObsNum + 1)
+        
+        
 class _Command(object):
     
     
@@ -94,6 +115,8 @@ class _TheoDataCommand(_Command):
         
     def __call__(self, args, interpreter):
         
+        obsNum = interpreter.obsNumGenerator.nextNumber
+        
         date, time = _getCurrentDateAndTime()
         
         theodolite = interpreter.theodolite
@@ -104,7 +127,7 @@ class _TheoDataCommand(_Command):
             raise CommandInterpreterError('Theodolite read failed. ' + str(e))
         
         return self.obsClass(
-            observationNum=0, date=date, time=time, declination=declination, azimuth=azimuth)
+            observationNum=obsNum, date=date, time=time, declination=declination, azimuth=azimuth)
     
         
 def _getCurrentDateAndTime():

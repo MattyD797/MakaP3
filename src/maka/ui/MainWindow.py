@@ -556,9 +556,9 @@ def _getDefaultDocumentFileFormat():
 
 def _getCommandInterpreter(doc):
     docFormatName = doc.documentFormat.extensionName
-    for cls in ExtensionManager.getExtensions('CommandInterpreter'):
-        if docFormatName in cls.documentFormatNames:
-            return cls()
+    for interpreterClass in ExtensionManager.getExtensions('CommandInterpreter'):
+        if docFormatName in interpreterClass.documentFormatNames:
+            return interpreterClass(doc)
     raise ValueError(
         'Command interpreter not found for document format "{:s}".'.format(docFormatName))
 
