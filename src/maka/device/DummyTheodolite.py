@@ -1,9 +1,9 @@
 class DummyTheodolite(object):
     
-    '''Dummy theodolite that always returns vertical and horizontal angles of zero.'''
+    '''Dummy theodolite that always returns vertical and horizontal angles of `None`.'''
     
     extensionName = 'Dummy Theodolite'
     
     def readAngles(self):
-        return (0., 0.)
+        return (None, None)
     
