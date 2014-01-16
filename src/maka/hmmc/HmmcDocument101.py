@@ -138,7 +138,29 @@ class Reticle(Decimal):
     UNITS = 'reticle number'
     MIN = '0'
         
-        
+      
+'''  
+observerTranslations = {
+    'Adam': 'asf',
+    'adam': 'asf',
+    'Chris': 'cmg',
+    'chris': 'cmg',
+    'Yin': 'sey',
+    'yin': 'sey',
+    'Susan': 'shr',
+    'susan': 'shr'
+}
+
+
+TObserver: Role.observer
+TRole: Role.role
+TObjectType: {BinocularFix, Fix, Sighting, ClosestApproach}.objectType
+TIndividual: Behavior.individualId
+TBehavioralState: {BinocularFix, Fix, Sighting}.behavioralState, BehavioralState.state
+TBehavior: Behavior.behavior
+'''
+
+
 # TODO: Should values be restricted? Most in 2013 data are 'Pod', 'Vessel', 'Reference',
 # or 'Buoy', but there are others like 'P' and 'z' as well.
 class SubjectType(String):

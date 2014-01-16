@@ -546,12 +546,12 @@ def _createNewDocument():
 
 # TODO: Don't hard code default document format name.
 def _getDefaultDocumentFormat():
-    return ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')
+    return ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')()
 
 
 # TODO: Don't hard code default document file format name.
 def _getDefaultDocumentFileFormat():
-    return ExtensionManager.getExtension('DocumentFileFormat', 'Maka Document File Format')
+    return ExtensionManager.getExtension('DocumentFileFormat', 'Maka Document File Format')()
 
 
 def _getCommandInterpreter(doc):

@@ -3,17 +3,14 @@ from __future__ import print_function
 import datetime
 import re
 
-from maka.hmmc.HmmcDocument101 import Station, TheoData
+from maka.hmmc.HmmcDocument101 import Comment, TheoData
 from maka.text.CommandInterpreterError import CommandInterpreterError
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
 import maka.text.TokenUtils as TokenUtils
 
 
-# TODO: Implement unquoted comments for HMMC?
-
-
-_compoundTokenRe = re.compile(r'^(\D+)(\d+)$')
+_COMMAND_NAME_RE = re.compile(r'^')
 
 
 class HmmcCommandInterpreter101(object):
@@ -24,120 +21,333 @@ class HmmcCommandInterpreter101(object):
 
 
     def __init__(self, doc):
+        
         super(HmmcCommandInterpreter101, self).__init__()
-        self.obsNumGenerator = _createObsNumGenerator(doc)
+        
+        self._docFormat = doc.documentFormat
         self._theodolite = None
         
+        self._obsNumGenerator = _createObsNumGenerator(doc)
+        self._commentIdGenerator = _createCommentIdGenerator(doc)
         
-    @property
-    def theodolite(self):
+        self._commands = self._createCommands()
+        
+        
+    def _getTheodolite(self):
+        
+        # We are careful to get the theodolite from the device manager lazily (that is,
+        # only when somebody actually tries to access it by invoking this method) so
+        # that the relevant device extension can be loaded when and only when it is
+        # actually needed.
         if self._theodolite is None:
             self._theodolite = DeviceManager.getDevice('Theodolite')
+            
         return self._theodolite
     
     
+    def _createCommands(self):
+        return dict((c.name, c) for c in [
+            _CommentCommand(self),
+            _TheoDataCommand(self),
+        ])
+
+
     def interpretCommand(self, command):
         
-        tokens = self._tokenizeCommand(command)
+        try:
+            tokens = TokenUtils.tokenizeString(command)
+        except ValueError, e:
+            raise CommandInterpreterError('Could not parse command. {:s}'.format(str(e)))
         
         if len(tokens) == 0:
             return
         
         try:
-            cmd = _commands[tokens[0]]
+            cmd = self._commands[tokens[0]]
             
         except KeyError:
-            raise CommandInterpreterError('Unrecognized command "{:s}".'.format(tokens[0]))
-        
-        else:
-            return cmd(tokens[1:], self)
-    
-    
-    def _tokenizeCommand(self, command):
-        
-        tokens = TokenUtils.tokenizeString(command)
-        
-        # TODO: Offer the following only as an HMMC customization? It might be better for the
-        # default command parser to be simpler.
-        if len(tokens) != 0:
+            # first command token is not a command name
             
-            m = _compoundTokenRe.match(tokens[0])
+            # Try to split one or more digits off from the end of the first token.
+            try:
+                splitTokens = _splitToken(tokens[0])
+            except ValueError:
+                _handleUnrecognizedCommandName(tokens[0])
             
-            if m is not None:
-                tokens = list(m.groups()) + tokens[1:]
+            # Try to look up first split token as a command name.
+            try:
+                cmd = self._commands[splitTokens[0]]
+            except KeyError:
+                _handleUnrecognizedCommandName(tokens[0])
+            
+            tokens = splitTokens + tokens[1:]
+        
+        return cmd(tokens[1:])
     
-        return tokens            
+    
+    def _getCurrentDateAndTime(self):
+        dt = datetime.datetime.now()
+        return (dt.date(), dt.time())
+
+
+    def _getNextObsNum(self):
+        return self._obsNumGenerator.nextNumber
+    
+    
+    def _getNextCommentId(self):
+        return self._commentIdGenerator.nextNumber
+    
+    
+    def _readTheodoliteAngles(self):
+        try:
+            return self._getTheodolite().readAngles()
+        except Exception as e:
+            raise CommandInterpreterError('Theodolite read failed. ' + str(e))
 
 
 def _createObsNumGenerator(doc):
+    return _createSerialNumGenerator(doc, _getObsNum)
+
+
+def _getObsNum(obs):
+    try:
+        return getattr(obs, 'observationNum')
+    except AttributeError:
+        return None
+        
+        
+def _createSerialNumGenerator(doc, getNum, defaultInitialNum=0):
     
-    maxObsNum = -1
+    maxNum = None
     
     for obs in doc.observations:
         
-        try:
-            obsNum = getattr(obs, 'observationNum')
-        except AttributeError:
-            continue
+        n = getNum(obs)
         
-        if obsNum > maxObsNum:
-            maxObsNum = obsNum
+        if n is not None and (maxNum is None or n > maxNum):
+            maxNum = n
             
-    return SerialNumberGenerator(maxObsNum + 1)
+    return SerialNumberGenerator(maxNum + 1 if maxNum is not None else defaultInitialNum)
         
         
+def _createCommentIdGenerator(doc):
+    return _createSerialNumGenerator(doc, _getCommentId)
+
+    
+def _getCommentId(obs):
+    if obs.__class__.__name__ == 'Comment':
+        return obs.id
+    else:
+        return None
+    
+    
+_COMPOUND_TOKEN_RE = re.compile(r'^(\D+)(\d+)$')
+
+
+def _splitToken(token):
+    
+    m = _COMPOUND_TOKEN_RE.match(token)
+     
+    if m is None:
+        raise ValueError()
+    
+    else:
+        return list(m.groups())
+        
+    
+def _handleUnrecognizedCommandName(name):
+    raise CommandInterpreterError('Unrecognized command name "{:s}".'.format(name))
+
+
 class _Command(object):
     
     
-    def __init__(self, template, obsClass):
+    observationClass = None
+    '''the class of the observations created by this command.'''
+    
+
+    format = None
+    '''
+    the format of this command.
+    
+    A command format comprises a *command name* followed by zero or more
+    *field names*, all separated by spaces. For example::
+    
+        'cmd x y'
+        
+    is the format of a command named `'cmd'` with the two field names
+    `'x'` and `'y'`. The field names must be the names of fields of
+    observations of type `observationClass`.
+    '''
+    
+    defaultFieldValues = {}
+    '''
+    the default field values of this command, a dictionary mapping field
+    names and tuples of field names to default values.
+    
+    A default field value may be specified either as a value of the appropriate
+    type or as a callable. A callable must take a single argument, a command
+    interpreter, and return a value of the appropriate type.
+    
+    Default values for multiple fields may be specified by a dictionary
+    entry whose key is a tuple of field names and whose value is either a
+    tuple of values of the appropriate types or a callable that takes
+    a command interpreter and returns such a tuple.
+    
+    Default field values for a command may be specified not only via the
+    `defaultFieldValues` attribute of the command's class, but also via
+    the `defaultFieldValues` attributes of its ancestor classes. The
+    specified dictionaries are combined when a command instance is
+    initialized so that when the command is executed the dictionaries
+    are effectively consulted for default field values in accordance with
+    the command class's method resolution order (MRO).
+    '''
+    
+    
+    def __init__(self, interpreter):
         
         super(_Command, self).__init__()
         
-        parts = template.split()
-        self.cmdName = parts[0]
-        self.paramNames = parts[1:]
+        (self._name, self._fieldNames) = self._parseFormat()
+        self._maxNumArgs = len(self._fieldNames)
         
-        self.obsClass = obsClass
+        self._accumulateDefaultFieldValues()
+        
+        self._interpreter = interpreter
+        
+        obsClassName = self.observationClass.__name__
+        self._obsFormat = self._interpreter._docFormat.getObservationFormat(obsClassName)
+
+        
+    def _parseFormat(self):
+        
+        parts = self.format.split()
+        
+        commandName = parts[0]
+        argNames = parts[1:]
+        
+        self._checkCommandArgNames(argNames, commandName)
+        
+        return commandName, argNames
         
         
-    def __call__(self, args, interpreter):
-        # Construct dictionary mapping field names to values.
-        # Construct and return observation.
-        print(self.cmdName, args)
+    def _checkCommandArgNames(self, argNames, commandName):
+        
+        fieldNames = frozenset(field.name for field in self.observationClass.FIELDS)
+        
+        for name in argNames:
+            if name not in fieldNames:
+                raise CommandInterpreterError(
+                    ('Bad argument name "{:s}" in command "{:s}" format. Argument '
+                     'name must be field name for observation type "{:s}".').format(
+                        name, commandName, self.observationClass.__name__))
+                                              
+    
+    def _accumulateDefaultFieldValues(self):
+        
+        # TODO: Check field names and values in `cls.defaultFieldValues` in the following.
+        
+        self._defaultFieldValues = {}
+
+        for cls in reversed(self.__class__.__mro__[:-1]):
+            
+            try:
+                defaultFieldValues = cls.defaultFieldValues
+            except AttributeError:
+                continue
+            
+            self._defaultFieldValues.update(defaultFieldValues)
+        
+       
+    @property
+    def name(self):
+        return self._name
+    
+                         
+    def __call__(self, args):
+        fieldValues = self._getFieldValues(args)
+        return self.observationClass(**fieldValues)
     
     
-class _TheoDataCommand(_Command):
-    
-    
-    def __init__(self):
-        super(_TheoDataCommand, self).__init__('z', TheoData)
+    def _checkNumArgs(self, args):
+        
+        if len(args) > self._maxNumArgs:
+            
+            if self._maxNumArgs == 0:
+                message = 'Command "{:s}" takes no arguments.'.format(self.name)
+            else:
+                message = 'Too many arguments for command "{:s}": maximum number is {:d}.'.format(
+                              self.name, self._maxNumArgs)
+                
+            raise CommandInterpreterError(message)
         
         
-    def __call__(self, args, interpreter):
+    def _getFieldValues(self, args):
         
-        obsNum = interpreter.obsNumGenerator.nextNumber
+        fieldValues = dict(self._parseArg(arg, i) for i, arg in enumerate(args))
         
-        date, time = _getCurrentDateAndTime()
+        for key, value in self._defaultFieldValues.iteritems():
+            
+            if isinstance(key, tuple):
+                # key is tuple of field names
+                
+                names = [name for name in key if name not in fieldValues]
+                
+                if len(names) != 0:
+                    # At least one of the named fields does not yet have a value.
+                    # We guard the following with this test to avoid invoking callables
+                    # to get field values that are not needed. This is particularly
+                    # important for stateful callables such as serial number generators.
+                    
+                    values = value(self._interpreter) if callable(value) else value
+                        
+                    for i, name in enumerate(key):
+                        if name not in fieldValues:
+                            fieldValues[name] = values[i]
+                            
+            else:
+                # key is a single field name
+                
+                if key not in fieldValues:
+                    # named field does not yet have a value
+                    
+                    fieldValues[key] = value(self._interpreter) if callable(value) else value
+                    
+        return fieldValues
+                
+                        
+    def _parseArg(self, arg, i):
         
-        theodolite = interpreter.theodolite
+        fieldName = self._fieldNames[i]
+        fieldFormat = self._obsFormat.getFieldFormat(fieldName)
         
         try:
-            declination, azimuth = theodolite.readAngles()
-        except Exception as e:
-            raise CommandInterpreterError('Theodolite read failed. ' + str(e))
-        
-        return self.obsClass(
-            observationNum=obsNum, date=date, time=time, declination=declination, azimuth=azimuth)
+            value = fieldFormat.parse(arg)
+            
+        except ValueError, e:
+            raise CommandInterpreterError(
+                'Could not parse "{:s}" argument for command "{:s}". {:s}'.format(
+                    fieldName, self.name, str(e)))
+            
+        return fieldName, value
+            
+            
+class _NdtCommand(_Command):
+    defaultFieldValues = {
+        'observationNum': HmmcCommandInterpreter101._getNextObsNum,
+        ('date', 'time'): HmmcCommandInterpreter101._getCurrentDateAndTime
+    }
     
-        
-def _getCurrentDateAndTime():
-    dt = datetime.datetime.now()
-    return (dt.date(), dt.time())
+    
+class _CommentCommand(_NdtCommand):
+    observationClass = Comment
+    format = 'c text id'
+    defaultFieldValues = { 'id': HmmcCommandInterpreter101._getNextCommentId }
+    
 
-
-_commands = dict((c.cmdName, c) for c in [
-    _TheoDataCommand(),
-    _Command(
-        'station id name latitudeDegrees latitudeMinutes longitudeDegrees longitudeMinutes '
-        'elevation magneticDeclination', Station)
-])
+class _TheoDataCommand(_NdtCommand):
+    observationClass = TheoData
+    format = 'z'
+    defaultFieldValues = {
+        ('declination', 'azimuth'): HmmcCommandInterpreter101._readTheodoliteAngles
+    }
