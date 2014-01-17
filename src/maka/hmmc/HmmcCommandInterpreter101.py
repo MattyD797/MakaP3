@@ -7,7 +7,7 @@ from maka.hmmc.HmmcDocument101 import Comment, Fix, TheoData
 from maka.text.CommandInterpreterError import CommandInterpreterError
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
-import maka.text.TokenUtils as TokenUtils
+import maka.util.TokenUtils as TokenUtils
 
 
 _COMMAND_NAME_RE = re.compile(r'^')

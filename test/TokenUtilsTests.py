@@ -1,4 +1,4 @@
-import maka.text.TokenUtils as TokenUtils
+import maka.util.TokenUtils as TokenUtils
 
 from MakaTests import TestCase
 

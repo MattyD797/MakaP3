@@ -19,7 +19,7 @@ Documents will use JSON.
 Basic idea is to define a Python class for each observation type so we can write code like:
 
     if obs.isinstance(Fix):
-        print(obs.azimuth, obs.declination, obs.subjectSype, obs.subjectId)
+        print(obs.azimuth, obs.declination, obs.objectSype, obs.objectId)
 
 An assignment to a field of an observation should check the assigned value and raise
 a ValueError if the value is inappropriate:
@@ -67,8 +67,8 @@ class Fix(Observation):
 
     azimuth = Azimuth()
     declination = Declination()
-    subjectType = SubjectType()
-    subjectId = SubjectId()
+    objectType = ObjectType()
+    objectId = ObjectId()
     
     
 We need to parse and format field values. My inclination would be *not* to include parsing

@@ -1,3 +1,6 @@
+'''Utility functions for string tokenization, for example for formats and commands.'''
+
+
 import re
 
 

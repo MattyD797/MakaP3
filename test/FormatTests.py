@@ -7,7 +7,7 @@ from maka.data.Observation import Observation
 from maka.text.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleObservationFormat,
     StringFormat, TimeFormat)
-from maka.text.TokenUtils import NONE_TOKEN as FORMATTED_NONE
+from maka.util.TokenUtils import NONE_TOKEN as FORMATTED_NONE
 
 from MakaTests import TestCase
 
@@ -387,9 +387,9 @@ class FormatTests(TestCase):
         observations = [
             Pod(id=1, numWhales=2, numCalves=1, numSingers=0),
             Fix(observationNum=10, date=date(2013, 2, 1), time=time(1, 23, 45), declination=91,
-                azimuth=2.5, subjectType='Pod', subjectId=1),
+                azimuth=2.5, objectType='Pod', objectId=1),
             Fix(observationNum=11, date=date(2013, 2, 1), time=time(1, 23, 50), declination=91,
-                azimuth=2.75, subjectType='Pod', subjectId=1)]
+                azimuth=2.75, objectType='Pod', objectId=1)]
 
         formattedObservations = [
             'Pod 1 Whales 2 Calves 1 Singers 0',

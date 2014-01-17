@@ -8,8 +8,8 @@ import re
 from maka.text.DocumentFormat import DocumentFormat
 from maka.text.FieldFormat import FieldFormat
 from maka.text.ObservationFormat import ObservationFormat
-from maka.text.TokenUtils import NONE_TOKEN as FORMATTED_NONE
-import maka.text.TokenUtils as TokenUtils
+from maka.util.TokenUtils import NONE_TOKEN as FORMATTED_NONE
+import maka.util.TokenUtils as TokenUtils
 
 
 # TODO: Support more format customization, e.g. for dates, times, and angles.
