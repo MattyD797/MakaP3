@@ -11,8 +11,8 @@ from PySide.QtGui import (
     QItemSelection, QItemSelectionModel, QLabel, QLineEdit, QListWidget, QMainWindow,
     QMenuBar, QMessageBox, QVBoxLayout, QWidget)
 
+from maka.command.CommandInterpreterError import CommandInterpreterError
 from maka.data.Document import Document
-from maka.format.CommandInterpreterError import CommandInterpreterError
 from maka.ui.ObservationDialog import ObservationDialog
 from maka.util.Preferences import preferences as prefs
 import maka.format.DocumentFileFormat as DocumentFileFormat

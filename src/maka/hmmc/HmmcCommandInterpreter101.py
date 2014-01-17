@@ -3,8 +3,8 @@ from __future__ import print_function
 import datetime
 import re
 
+from maka.command.CommandInterpreterError import CommandInterpreterError
 from maka.hmmc.HmmcDocument101 import Comment, Fix, TheoData
-from maka.format.CommandInterpreterError import CommandInterpreterError
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
 import maka.util.TokenUtils as TokenUtils
@@ -187,7 +187,7 @@ def _splitToken(token):
         
     
 def _handleUnrecognizedCommandName(name):
-    raise CommandInterpreterError('Unrecognized command name "{:s}".'.format(name))
+    raise CommandInterpreterError('Unrecognized command "{:s}".'.format(name))
 
 
 class _Command(object):
