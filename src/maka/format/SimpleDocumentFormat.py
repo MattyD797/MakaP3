@@ -5,9 +5,9 @@ import calendar
 import datetime
 import re
 
-from maka.text.DocumentFormat import DocumentFormat
-from maka.text.FieldFormat import FieldFormat
-from maka.text.ObservationFormat import ObservationFormat
+from maka.format.DocumentFormat import DocumentFormat
+from maka.format.FieldFormat import FieldFormat
+from maka.format.ObservationFormat import ObservationFormat
 from maka.util.TokenUtils import NONE_TOKEN as FORMATTED_NONE
 import maka.util.TokenUtils as TokenUtils
 

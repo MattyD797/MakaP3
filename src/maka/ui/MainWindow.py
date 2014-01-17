@@ -12,10 +12,10 @@ from PySide.QtGui import (
     QMenuBar, QMessageBox, QVBoxLayout, QWidget)
 
 from maka.data.Document import Document
-from maka.text.CommandInterpreterError import CommandInterpreterError
+from maka.format.CommandInterpreterError import CommandInterpreterError
 from maka.ui.ObservationDialog import ObservationDialog
 from maka.util.Preferences import preferences as prefs
-import maka.text.DocumentFileFormat as DocumentFileFormat
+import maka.format.DocumentFileFormat as DocumentFileFormat
 import maka.util.ExtensionManager as ExtensionManager
  
  

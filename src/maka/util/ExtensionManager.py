@@ -33,7 +33,7 @@ def _initializeIfNeeded():
         
     _extensions = {}
     
-    from maka.text.MakaDocumentFileFormat import MakaDocumentFileFormat
+    from maka.format.MakaDocumentFileFormat import MakaDocumentFileFormat
     _addExtensions('DocumentFileFormat', [MakaDocumentFileFormat])
     
     from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101, MmrpDocumentFormat101

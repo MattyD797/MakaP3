@@ -4,7 +4,7 @@ import datetime
 
 from maka.data.Field import Float, Integer, String
 from maka.data.Observation import Observation
-from maka.text.SimpleDocumentFormat import (
+from maka.format.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleObservationFormat,
     StringFormat, TimeFormat)
 from maka.util.TokenUtils import NONE_TOKEN as FORMATTED_NONE

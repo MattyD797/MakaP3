@@ -2,7 +2,7 @@
 
 
 from maka.hmmc.HmmcDocument101 import HmmcDocument101
-from maka.text.SimpleDocumentFormat import (
+from maka.format.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleDocumentFormat,
     StringFormat, TimeFormat)
 
