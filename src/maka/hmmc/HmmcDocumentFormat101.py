@@ -33,10 +33,10 @@ _observationFormats = {
     'Rebalance': _ndt('Rebalance*'),
     'Role': _ndt('Role* {observer} {role}'),
     'TheoData': _ndt('TheoData* Dec {declination} Az {azimuth}'),
-    'Fix': _ndt('Fix* Dec {declination} Az {azimuth} {subjectType} {subjectId} '
-                'State {subjectState}'),
+    'Fix': _ndt('Fix* Dec {declination} Az {azimuth} {objectType} {objectId} '
+                'State {behavioralState}'),
     'BinocularFix': _ndt(
-        'BinocularFix* {subjectType} {subjectId} Ret {reticle} Az {azimuth} State '
+        'BinocularFix* {objectType} {objectId} Ret {reticle} Az {azimuth} State '
         '{behavioralState}'),
     'StartScan': _ndt('StartScan* {id} Visibility {visibility} Beaufort {beaufort} '
                       'Swell {swellHeight} Vessels {numVessels} Pods {numPods}'),

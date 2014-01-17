@@ -12,7 +12,7 @@ How to specify string formatting and parsing?
 
 I like the idea of using format strings somewhat like those of Python 3:
 
-'Fix': '{num:05d} {date} {time} Fix Dec {declination} Az {azimuth} {subject_type} {subject_id}'
+'Fix': '{num:05d} {date} {time} Fix Dec {declination} Az {azimuth} {object_type} {object_id}'
 
 How to arrange for formatting of dates, times, and angles?
 Should theo declinations and azimuths be stored as floating point numbers, or as strings?
@@ -52,13 +52,13 @@ forms = {
     'Fix': _ndtFields(
         TextField('Declination (ddd:mm:ss)', 'declination'),
         TextField('Azimuth (ddd:mm:ss)', 'azimuth'),
-        TextField('Subject Type', 'subjectType'),
-        TextField('Subject ID', 'subjectId'))
+        TextField('Object Type', 'objectType'),
+        TextField('Object ID', 'objectId'))
     
     'Sighting': _ndtFields(
         TextField('Observer ID', 'observerId'),
-        TextField('Subject Type', 'subjectType'),
-        TextField('Subject ID', 'subjectId'),
+        TextField('Object Type', 'objectType'),
+        TextField('Object ID', 'objectId'),
         TextField('Behavioral State', 'behavioralState'))
         
 }
@@ -75,8 +75,8 @@ forms = {
         "NumDateTime",
         ["TextField", "declination", "Declination (ddd:mm:ss)"],
         ["TextField", "azimuth", "Azimuth (ddd:mm:ss)"],
-        ["TextField", "subject_type", "Subject Type"],
-        {"type": "TextField", "field": "subject_id", "label": "Subject ID"}
+        ["TextField", "object_type", "Object Type"],
+        {"type": "TextField", "field": "object_id", "label": "Object ID"}
 '''
 
 
@@ -163,7 +163,7 @@ TBehavior: Behavior.behavior
 
 # TODO: Should values be restricted? Most in 2013 data are 'Pod', 'Vessel', 'Reference',
 # or 'Buoy', but there are others like 'P' and 'z' as well.
-class SubjectType(String):
+class ObjectType(String):
     pass
         
         
@@ -294,17 +294,17 @@ class Fix(Ndt):
     azimuth = Azimuth(
         doc='the azimuth of this fix in degrees clockwise from zero, in the range [0, 360)')
               
-    subjectType = SubjectType(doc='the type of the subject of this fix')
+    objectType = ObjectType(doc='the type of the object of this fix')
         
-    subjectId = Id(doc='the ID of the subject of this fix')
+    objectId = Id(doc='the ID of the object of this fix')
     
-    subjectState = String(doc='the behavioral state of the subject of this fix')
+    behavioralState = String(doc='the behavioral state of the object of this fix')
 
 
 # TODO: What are azimuth units here?
 class BinocularFix(Ndt):
-    subjectType = SubjectType
-    subjectId = Id
+    objectType = ObjectType
+    objectId = Id
     reticle = Reticle
     azimuth = Decimal(units='degrees clockwise from magnetic north', min='0', max='360', maxInclusive=False)
     behavioralState = BehavioralState
@@ -398,7 +398,7 @@ class HmmcDocument101(object):
         Environment, Behavior, PodEvent, Lag, DeleteLastEntry])
     
     fieldClasses = frozenset([
-        Azimuth, Count, Date, Declination, Decimal, Id, Integer, String, SubjectType, Time])
+        Azimuth, Count, Date, Declination, Decimal, Id, Integer, String, ObjectType, Time])
     
     
     def __init__(self, observations=None, filePath=None, fileFormat=None):
@@ -429,7 +429,7 @@ the following:
             "max": 180
         }
         
-        "SubjectType": {
+        "ObjectType": {
             "super": "String",
             "values": ["Pod", "Vessel"]
         }
@@ -469,13 +469,13 @@ the following:
                     "type": "Azimuth",
                     "doc": "the azimuth of this fix, in the range [0, 360) of degrees clockwise"
                 },
-                "subject_type", {
-                    "type": "SubjectType",
-                    "doc": "the type of the subject of this fix"
+                "object_type", {
+                    "type": "ObjectType",
+                    "doc": "the type of the object of this fix"
                 },
-                "subject_id", {
-                    "type": "SubjectID",
-                    "doc": "the ID of the subject of this fix."
+                "object_id", {
+                    "type": "ObjectID",
+                    "doc": "the ID of the object of this fix."
                 }
             ]
         }
