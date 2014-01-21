@@ -5,21 +5,21 @@ import datetime
 from maka.command.CommandInterpreterError import CommandInterpreterError
 from maka.command.SimpleCommand import SimpleCommand
 from maka.command.SimpleCommandInterpreter import SimpleCommandInterpreter
-from maka.hmmc.HmmcDocument101 import Comment, Fix, TheoData
+from maka.mmrp.MmrpDocument101 import Comment, Fix, TheoData
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
 
 
-class HmmcCommandInterpreter101(SimpleCommandInterpreter):
+class MmrpCommandInterpreter101(SimpleCommandInterpreter):
     
     
-    extensionName = 'HMMC Command Interpreter 1.01'
-    documentFormatNames = frozenset(('HMMC Document Format 1.01', "'96 MMRP Grammar 1.01"))
+    extensionName = 'MMRP Command Interpreter 1.01'
+    documentFormatNames = frozenset(["'96 MMRP Grammar 1.01"])
 
 
     def __init__(self, doc):
         
-        super(HmmcCommandInterpreter101, self).__init__(doc)
+        super(MmrpCommandInterpreter101, self).__init__(doc)
         
         self._savedDate = None
         self._savedTime = None
@@ -132,7 +132,7 @@ def _getCommentId(obs):
         return None
     
     
-_Interpreter = HmmcCommandInterpreter101
+_Interpreter = MmrpCommandInterpreter101
 
 
 class _NdtCommand(SimpleCommand):

@@ -1,7 +1,7 @@
-'''HMMC Maka field and observation formats.'''
+'''MMRP field and observation formats.'''
 
 
-from maka.hmmc.HmmcDocument101 import HmmcDocument101
+from maka.mmrp.MmrpDocument101 import MmrpDocument101
 from maka.format.SimpleDocumentFormat import (
     AngleFormat, DateFormat, DecimalFormat, FloatFormat, IntegerFormat, SimpleDocumentFormat,
     StringFormat, TimeFormat)
@@ -73,13 +73,9 @@ _fieldFormats = {
 }
 
 
-class HmmcDocumentFormat101(SimpleDocumentFormat):
-    extensionName = 'HMMC Document Format 1.01'
-    documentClass = HmmcDocument101
+class MmrpDocumentFormat101(SimpleDocumentFormat):
+    extensionName = "'96 MMRP Grammar 1.01"
+    documentClass = MmrpDocument101
     observationFormats = _observationFormats
     fieldFormats = _fieldFormats
-
-
-class MmrpDocumentFormat101(HmmcDocumentFormat101):
-    extensionName = "'96 MMRP Grammar 1.01"
     

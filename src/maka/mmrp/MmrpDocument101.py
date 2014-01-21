@@ -1,4 +1,4 @@
-'''HMMC Maka field and observation classes.'''
+'''MMRP field and observation classes.'''
 
 
 from __future__ import print_function
@@ -385,10 +385,10 @@ class DeleteLastEntry(Ndt):
     pass
 
 
-class HmmcDocument101(object):
+class MmrpDocument101(object):
     
     
-    extensionName = 'HMMC Document 1.01'
+    extensionName = 'MMRP Document 1.01'
     
     observationClasses = frozenset([
         Station, Theodolite, Reference, Observer, Pod, Vessel, Start, End, Comment,

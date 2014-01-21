@@ -101,14 +101,14 @@ plugins package
 '''
     
 
-HMMC_DATA_DIR_PATH = '/Users/Harold/Desktop/Maka/HMMC 2013/Data'
-TEMP_FILE_PATH = '/Users/Harold/Desktop/Temp.txt'
+HMMC_DATA_DIR_PATH = '/Users/Harold/Desktop/Stuff/Maka/HMMC 2013/Data'
+TEMP_FILE_PATH = '/Users/Harold/Desktop/Stuff/Maka/Temp.txt'
 
 
 def main():
     
     fileFormat = ExtensionManager.getExtension('DocumentFileFormat', 'Maka Document File Format')()
-    docFormat = ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')()
+    docFormat = ExtensionManager.getExtension('DocumentFormat', "'96 MMRP Grammar 1.01")()
 
     for dirPath, _, fileNames in os.walk(HMMC_DATA_DIR_PATH):
         

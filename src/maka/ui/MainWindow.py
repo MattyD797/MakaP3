@@ -23,7 +23,7 @@ import maka.util.ExtensionManager as ExtensionManager
 RESUME
 
 * Commands
-* Complete HMMC observation classes, document format, and commands.
+* Complete MMRP observation classes, document format, and commands.
 * Unsaved data quit dialog.
 * Auto-save
 * Reminders
@@ -546,7 +546,7 @@ def _createNewDocument():
 
 # TODO: Don't hard code default document format name.
 def _getDefaultDocumentFormat():
-    return ExtensionManager.getExtension('DocumentFormat', 'HMMC Document Format 1.01')()
+    return ExtensionManager.getExtension('DocumentFormat', "'96 MMRP Grammar 1.01")()
 
 
 # TODO: Don't hard code default document file format name.

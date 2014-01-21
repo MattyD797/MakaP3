@@ -5,7 +5,7 @@ import maka.util.ExtensionManager as ExtensionManager
 
 
 # For the time being we retain "aardvark data" rather than switching to "maka data"
-# since we want to be able to open Maka HMMC data files in the Aardvark Viewer.
+# since we want to be able to open Maka MMRP data files in the Aardvark Viewer.
 # We can switch to "maka data" when the Aardvark Viewer is no longer needed.
 _FIRST_HEADER_LINE = 'aardvark data'
 
@@ -13,9 +13,8 @@ _GRAMMAR_PREFIX = 'grammar '
 _FORMAT_PREFIX = 'format '
 
 
-# TODO: Think more about Maka/Aardvark interoperability, and make whatever changes
-# are needed so that files created by Maka can be opened with the Aardvark Viewer.
-# Perhaps there should be an Aardvark compatibility mode (the default for now)?
+# TODO: Think more about Maka/Aardvark interoperability. Perhaps there should be an
+# Aardvark compatibility mode (the default for now)?
 
 
 '''
@@ -142,5 +141,5 @@ def _getExtension(typeName, extensionName, description, lineNum, filePath):
 
 
 def _writeHeader(file, docFormat):
-    formatLine = 'format {:s}\n'.format(docFormat.extensionName)
-    file.writelines(['aardvark data\n', formatLine, '\n'])
+    formatLine = '{:s}"{:s}"'.format(_GRAMMAR_PREFIX, docFormat.extensionName)
+    file.write('{:s}\n{:s}\n\n'.format(_FIRST_HEADER_LINE, formatLine))

@@ -335,7 +335,7 @@ class FormatTests(TestCase):
         
     def testSimpleObservationFormat(self):
         
-        from  maka.hmmc.HmmcDocumentFormat101 import _fieldFormats
+        from  maka.mmrp.MmrpDocumentFormat101 import _fieldFormats
         
         obs = Obs()
         
@@ -353,7 +353,7 @@ class FormatTests(TestCase):
 
     def testSimpleObservationFormatErrors(self):
         
-        from  maka.hmmc.HmmcDocumentFormat101 import _fieldFormats
+        from  maka.mmrp.MmrpDocumentFormat101 import _fieldFormats
         
         cases = ['{f]', '{{f}', 'float {f}']
         
@@ -363,10 +363,10 @@ class FormatTests(TestCase):
         
     def testObsParse(self):
         
-        import maka.hmmc.HmmcDocumentFormat101 as hmmcDocFormat
+        import maka.mmrp.MmrpDocumentFormat101 as mmrpDocFormat
         
         f = SimpleObservationFormat(
-            'float* {f} integer {i} string {s}', Obs, hmmcDocFormat._fieldFormats)
+            'float* {f} integer {i} string {s}', Obs, mmrpDocFormat._fieldFormats)
         
         cases = [
             ('float 1.23 integer 2 string "Hello"', {'f': 1.23, 'i': 2, 's': 'Hello'})
@@ -381,8 +381,8 @@ class FormatTests(TestCase):
     def testFormatAndParseDocument(self):
         
         from datetime import date, time
-        from maka.hmmc.HmmcDocument101 import Fix, Pod
-        from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101
+        from maka.mmrp.MmrpDocument101 import Fix, Pod
+        from maka.mmrp.MmrpDocumentFormat101 import MmrpDocumentFormat101
         
         observations = [
             Pod(id=1, numWhales=2, numCalves=1, numSingers=0),
@@ -399,38 +399,38 @@ class FormatTests(TestCase):
         
         formattedDocument = ''.join([obs + '\n' for obs in formattedObservations])
         
-        f = HmmcDocumentFormat101()
+        f = MmrpDocumentFormat101()
         self.assertEqual(f.formatDocument(observations), formattedDocument)
         self.assertEqual(f.parseDocument(formattedObservations), observations)
         
         
     def testFormatObservation(self):
         
-        from maka.hmmc.HmmcDocument101 import Pod
-        from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101
+        from maka.mmrp.MmrpDocument101 import Pod
+        from maka.mmrp.MmrpDocumentFormat101 import MmrpDocumentFormat101
         
         obs = Pod(id=1, numWhales=2, numCalves=1, numSingers=0)
         formattedObs = 'Pod 1 Whales 2 Calves 1 Singers 0'
         
-        f = HmmcDocumentFormat101()
+        f = MmrpDocumentFormat101()
         self.assertEqual(f.formatObservation(obs), formattedObs)
         
         
     def testFormatFieldValue(self):
 
-        from maka.hmmc.HmmcDocument101 import Pod
-        from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101
+        from maka.mmrp.MmrpDocument101 import Pod
+        from maka.mmrp.MmrpDocumentFormat101 import MmrpDocumentFormat101
         
         obs = Pod(id=1, numWhales=2, numCalves=1, numSingers=0)
         
-        f = HmmcDocumentFormat101().getObservationFormat(obs.__class__.__name__)
+        f = MmrpDocumentFormat101().getObservationFormat(obs.__class__.__name__)
         self.assertEqual(f.formatFieldValue('numWhales', obs), '2')
         
         
     def testFieldOrder(self):
-        from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101
+        from maka.mmrp.MmrpDocumentFormat101 import MmrpDocumentFormat101
         obsClassName = 'Pod'
-        f = HmmcDocumentFormat101().getObservationFormat(obsClassName)
+        f = MmrpDocumentFormat101().getObservationFormat(obsClassName)
         self.assertEqual(f.fieldOrder, ('id', 'numWhales', 'numCalves', 'numSingers'))
         
         

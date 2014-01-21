@@ -36,11 +36,11 @@ def _initializeIfNeeded():
     from maka.format.MakaDocumentFileFormat import MakaDocumentFileFormat
     _addExtensions('DocumentFileFormat', [MakaDocumentFileFormat])
     
-    from maka.hmmc.HmmcDocumentFormat101 import HmmcDocumentFormat101, MmrpDocumentFormat101
-    _addExtensions('DocumentFormat', [HmmcDocumentFormat101, MmrpDocumentFormat101])
+    from maka.mmrp.MmrpDocumentFormat101 import MmrpDocumentFormat101
+    _addExtensions('DocumentFormat', [MmrpDocumentFormat101])
     
-    from maka.hmmc.HmmcCommandInterpreter101 import HmmcCommandInterpreter101
-    _addExtensions('CommandInterpreter', [HmmcCommandInterpreter101])
+    from maka.mmrp.MmrpCommandInterpreter101 import MmrpCommandInterpreter101
+    _addExtensions('CommandInterpreter', [MmrpCommandInterpreter101])
     
     from maka.device.SokkiaTheodolite import SokkiaDt4Theodolite, SokkiaDt500Theodolite
     from maka.device.DummyTheodolite import DummyTheodolite
