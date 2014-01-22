@@ -2,7 +2,7 @@ Maka
 ====
 Maka is simple, configurable software for the efficient collection of textual animal behavioral observations. To configure Maka for a particular project you specify:
 
-1. The syntax of the *observations* to be collected. There can be any number of different types of observations.
+1. The types and syntax of the *observations* to be collected. There can be any number of different types of observations.
 
 2. The syntax of *commands* that will be typed to create observations, and how observations will be created from them. The commands are typically more terse than the observations, so that data can be collected efficiently.
 
