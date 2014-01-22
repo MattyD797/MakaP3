@@ -13,10 +13,6 @@ _GRAMMAR_PREFIX = 'grammar '
 _FORMAT_PREFIX = 'format '
 
 
-# TODO: Think more about Maka/Aardvark interoperability. Perhaps there should be an
-# Aardvark compatibility mode (the default for now)?
-
-
 '''
 aardvark data
 grammar "'96 MMRP Grammar 1.01"
