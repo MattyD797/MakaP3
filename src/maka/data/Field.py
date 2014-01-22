@@ -201,6 +201,7 @@ class String(Field):
     TYPE_NAME = 'string'
     VALUES = None
     RANGE = None
+    TRANSLATIONS = None
     
     
     # TODO: Fix this for Python 3.
@@ -211,7 +212,16 @@ class String(Field):
         
         super(String, self).__init__(**kwds)
         
-        values = kwds.get('values', self.VALUES)
+        self._initValues(kwds.get('values', self.VALUES))
+            
+        self._range = kwds.get('range', self.RANGE)
+        
+        self._rangeCheck(self.default, 'default')
+        
+        self._initTranslations(kwds.get('translations', self.TRANSLATIONS))
+                
+        
+    def _initValues(self, values):
         
         if values is not None:
             
@@ -225,9 +235,14 @@ class String(Field):
             self._values = None
             self._valuesSet = None
             
-        self._range = kwds.get('range', self.RANGE)
+            
+    def _initTranslations(self, translations):
         
-        self._rangeCheck(self.default)
+        if translations is not None:
+            for value in translations.itervalues():
+                self._rangeCheck(value, 'translation')
+                
+        self._translations = translations
         
         
     @property
@@ -248,12 +263,57 @@ class String(Field):
             return None
         
         
-    def _rangeCheck(self, value):
+    def _rangeCheck(self, value, description=None):
         
+        if description is None:
+            description = ''
+        else:
+            description += ' '
+            
         if value is not None and self._values is not None and value not in self._valuesSet:
             raise ValueError(
-                'Bad {:s} field value {:s}. Value must be in the set {:s}.'.format(
-                    _className(self), _quote(value), _formatStringSet(self._values)))
+                'Bad {:s} field {:s}value {:s}. Value must be in the set {:s}.'.format(
+                    _className(self), description, _quote(value), _formatStringSet(self._values)))
+        
+        
+    def __set__(self, obs, value):
+        
+        '''
+        Set the value of this field on the specified observation with notification.
+        
+        The value is translated if translations have been specified for this field, and
+        the value is set if and only if the new value differs from the old one.
+        '''
+        
+        if self._translations is not None:
+            value = self._translations.get(value, value)
+            
+        oldValue = getattr(obs, self._valueName)
+        
+        if value != oldValue:
+            self._setValue(obs, value, False)
+            obs.notifyFieldValueChanged(self.name, oldValue, value)
+        
+
+    def _setValue(self, obs, value, translate=True):
+        
+        '''
+        Set the value of this field on the specified observation without notification.
+        
+        The value is translated if and only if the `translate` argument is `True` and
+        translations have been specified for this field.
+        
+        The value is set regardless of whether it differs from the old one, or whether
+        there is an old value at all.
+        '''
+        
+        if translate and self._translations is not None:
+            value = self._translations.get(value, value)
+            
+        if value is not None:
+            self._check(value)
+            
+        setattr(obs, self._valueName, value)
         
         
 class Integer(Field):

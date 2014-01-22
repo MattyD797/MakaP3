@@ -161,6 +161,22 @@ TBehavior: Behavior.behavior
 '''
 
 
+_observerInitialsTranslations = {
+    'Adam': 'asf',
+    'adam': 'asf',
+    'Chris': 'cmg',
+    'chris': 'cmg',
+    'Yin': 'sey',
+    'yin': 'sey',
+    'Susan': 'shr',
+    'susan': 'shr'
+}
+
+
+class ObserverInitials(String):
+    TRANSLATIONS = _observerInitialsTranslations
+    
+    
 # TODO: Should values be restricted? Most in 2013 data are 'Pod', 'Vessel', 'Reference',
 # or 'Buoy', but there are others like 'P' and 'z' as well.
 class ObjectType(String):
@@ -233,7 +249,7 @@ class Reference(Observation):
     
     
 class Observer(Observation):
-    initials = String
+    initials = ObserverInitials
     name = String
     
     
@@ -277,7 +293,7 @@ class Rebalance(Ndt):
 
 
 class Role(Ndt):
-    observer = String
+    observer = ObserverInitials
     role = String         # TODO: Restrict values?
     
     

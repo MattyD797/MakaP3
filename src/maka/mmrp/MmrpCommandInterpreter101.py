@@ -5,7 +5,7 @@ import datetime
 from maka.command.CommandInterpreterError import CommandInterpreterError
 from maka.command.SimpleCommand import SimpleCommand
 from maka.command.SimpleCommandInterpreter import SimpleCommandInterpreter
-from maka.mmrp.MmrpDocument101 import Comment, Fix, TheoData
+from maka.mmrp.MmrpDocument101 import Comment, Fix, Observer, Role, TheoData
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
 
@@ -34,8 +34,10 @@ class MmrpCommandInterpreter101(SimpleCommandInterpreter):
         
     def _createCommands(self):
         return dict((c.name, c) for c in [
-            _CommentCommand(self),
-            _TheoDataCommand(self),
+            _Observer(self),
+            _Role(self),
+            _Comment(self),
+            _TheoData(self),
             _PodFix(self),
             _VesselFix(self),
             _SpinnerPodFix(self),
@@ -135,20 +137,30 @@ def _getCommentId(obs):
 _Interpreter = MmrpCommandInterpreter101
 
 
-class _NdtCommand(SimpleCommand):
+class _Observer(SimpleCommand):
+    observationClass = Observer
+    format = 'observer initials name'
+    
+
+class _Ndt(SimpleCommand):
     defaultFieldValues = {
         'observationNum': _Interpreter._getNextObsNum,
         ('date', 'time'): _Interpreter._getCurrentDateAndTime
     }
     
     
-class _CommentCommand(_NdtCommand):
+class _Comment(_Ndt):
     observationClass = Comment
     format = 'c text id'
     defaultFieldValues = { 'id': _Interpreter._getNextCommentId }
     
 
-class _TheoDataCommand(_NdtCommand):
+class _Role(_Ndt):
+    observationClass = Role
+    format = 'role observer role'
+    
+    
+class _TheoData(_Ndt):
     observationClass = TheoData
     format = 'z'
     defaultFieldValues = {
@@ -157,7 +169,7 @@ class _TheoDataCommand(_NdtCommand):
     }
     
     
-class _Fix(_NdtCommand):
+class _Fix(_Ndt):
     observationClass = Fix
     defaultFieldValues = {
         ('date', 'time'): _Interpreter._getSavedDateAndTime,

@@ -37,3 +37,42 @@ class StringFieldTests(FieldTests):
         
     def testDefaultTypeError(self):
         self._assertRaises(ValueError, String, **{'values': ['One', 'Two'], 'default': 'Three'})
+        
+        
+    def testTranslations(self):
+        
+        class TranslatedString(String):
+            TRANSLATIONS = {'1': 'one', '2': 'two'}
+            
+        class Obs(Observation):
+            s = String(translations={'0': 'zero', '1': 'one'})
+            t = TranslatedString
+            
+        obs = Obs()
+        
+        obs.s = '0'
+        self.assertEqual(obs.s, 'zero')
+        
+        obs.s = '1'
+        self.assertEqual(obs.s, 'one')
+        
+        obs.s = '2'
+        self.assertEqual(obs.s, '2')
+        
+        obs.t = '0'
+        self.assertEqual(obs.t, '0')
+ 
+        obs.t = '1'
+        self.assertEqual(obs.t, 'one')
+        
+        obs.t = '2'
+        self.assertEqual(obs.t, 'two')
+        
+        obs = Obs(s='0', t='0')
+        self.assertEqual(obs.s, 'zero')
+        self.assertEqual(obs.t, '0')
+        
+        
+    def testTranslationValueError(self):
+        self._assertRaises(ValueError, String, **{'values': ['One'], 'translations': {'2': 'Two'}})
+        
