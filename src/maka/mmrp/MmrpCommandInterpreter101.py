@@ -8,6 +8,7 @@ from maka.command.SimpleCommandInterpreter import SimpleCommandInterpreter
 from maka.mmrp.MmrpDocument101 import Comment, Fix, Observer, Role, TheoData
 from maka.util.SerialNumberGenerator import SerialNumberGenerator
 import maka.device.DeviceManager as DeviceManager
+import maka.util.AngleUtils as AngleUtils
 
 
 class MmrpCommandInterpreter101(SimpleCommandInterpreter):
@@ -90,7 +91,9 @@ class MmrpCommandInterpreter101(SimpleCommandInterpreter):
             raise CommandInterpreterError('Theodolite read failed. ' + str(e))
         
     def _getAndSaveTheodoliteAngles(self):
-        self._savedDeclination, self._savedAzimuth = self._getTheodoliteAngles()
+        v, h = self._getTheodoliteAngles()
+        self._savedDeclination = AngleUtils.radiansToDegrees(v)
+        self._savedAzimuth = AngleUtils.radiansToDegrees(h)
         return self._getSavedTheodoliteAngles()
         
         

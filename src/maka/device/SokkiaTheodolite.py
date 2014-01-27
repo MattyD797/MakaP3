@@ -7,10 +7,9 @@ Note that this module depends on the PySerial serial communications Python exten
 
 from __future__ import print_function
 
-import math
-
 from maka.device.SerialPort import SerialPort
 from maka.device.TheodoliteError import TheodoliteError
+import maka.util.AngleUtils as AngleUtils
 
 
 _TILT_ERROR_MESSAGE = 'Tilt angle is outside of compensation range. Please re-level theodolite.'
@@ -237,7 +236,7 @@ class SokkiaTheodolite(object):
                     description, angleString, self._data))
             
         else:
-            return (degrees + minutes / 60. + seconds / 3600.) * math.pi / 180.
+            return AngleUtils.degreesToRadians(degrees + minutes / 60. + seconds / 3600.)
 
 
 class SokkiaDt4Theodolite(SokkiaTheodolite):
