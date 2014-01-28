@@ -7,57 +7,88 @@ from maka.format.SimpleDocumentFormat import (
     StringFormat, TimeFormat)
 
 
-def _ndt(s):
-    return '{observationNum:05d} {date} {time} ' + s
+
+def _createSep(affix):
+    return ' ' if len(affix) > 0 else ''
 
 
-_observationFormats = {
+def _createFormatKeyValuePair(prefix, name, suffix=''):
+    prefixSep = _createSep(prefix)
+    suffixSep = _createSep(suffix)
+    return (name, prefix + prefixSep + name + '*' + suffixSep + suffix)
 
-    'Station': ('Station* {id} {name} '
-                'Lat {latitudeDegrees} {latitudeMinutes} '
-                'Lon {longitudeDegrees} {longitudeMinutes} '
-                'El {elevation} MagDec {magneticDeclination}'),
-    'Theodolite': ('Theodolite* {id} {name} '
-                   'AzOffset {azimuthOffset} DecOffset {declinationOffset}'),
-    'Reference': 'Reference* {id} {name} Azimuth {azimuth}',
-    'Observer': 'Observer* {initials} {name}',
-    'Pod': 'Pod* {id} Whales {numWhales} Calves {numCalves} Singers {numSingers}',
+
+_ENVIRONMENT = 'Visibility {visibility} Beaufort {beaufort} Swell {swellHeight}'
+_POD = 'Pod {podId}'
+_DEC_AZ = 'Dec {declination} Az {azimuth}'
+_OBJECT = '{objectType} {objectId}'
+_BEHAVIORAL_STATE = 'State {behavioralState}'
+_EVENT = '{code} {event}'
+
+
+_observationFormats = dict([_createFormatKeyValuePair('', *f) for f in [
+                                 
+    # formats for observation types without observation number, date, and time                        
+    ('Station',
+         '{id} {name} '
+         'Lat {latitudeDegrees} {latitudeMinutes} '
+         'Lon {longitudeDegrees} {longitudeMinutes} '
+         'El {elevation} MagDec {magneticDeclination}'),
+    ('Observer', '{initials} {name}'),
+    ('Theodolite', '{id} {name} AzOffset {azimuthOffset} DecOffset {declinationOffset}'),
+    ('Reference', '{id} {name} Azimuth {azimuth}'),
+    ('Pod', '{id} Whales {numWhales} Calves {numCalves} Singers {numSingers}')
     
-    'Vessel': _ndt('Vessel* {id} Type {type}'),
-    
-    'Start': _ndt('Start*'),
-    'End': _ndt('End*'),
-    'Comment': _ndt('Comment* {id} {text}'),
-    'EyepieceHeight': _ndt('EyepieceHeight* {eyepieceHeight}'),
-    'BubbleCheck': _ndt('BubbleCheck*'),
-    'Rebalance': _ndt('Rebalance*'),
-    'Role': _ndt('Role* {observer} {role}'),
-    'TheoData': _ndt('TheoData* Dec {declination} Az {azimuth}'),
-    'Fix': _ndt('Fix* Dec {declination} Az {azimuth} {objectType} {objectId} '
-                'State {behavioralState}'),
-    'BinocularFix': _ndt(
-        'BinocularFix* {objectType} {objectId} Ret {reticle} Az {azimuth} State '
-        '{behavioralState}'),
-    'StartScan': _ndt('StartScan* {id} Visibility {visibility} Beaufort {beaufort} '
-                      'Swell {swellHeight} Vessels {numVessels} Pods {numPods}'),
-    'EndScan': _ndt('EndScan*'),
-    'StartVesselScan': _ndt('StartVesselScan*'),
-    'EndVesselScan': _ndt('EndVesselScan*'),
-    'StartFocalSession': _ndt(
-        'StartFocalSession* {sessionId} Pod {podId} Or {orientation} {speed} '
+]] + [_createFormatKeyValuePair('{observationNum:05d} {date} {time}', *f) for f in [
+                     
+    # formats for observation types with observation number, date, and time             
+    ('Role', '{observer} {role}'),
+    ('Start',),
+    ('End',),
+    ('Comment', '{id} {text}'),
+    ('Vessel', '{id} Type {type}'),
+    ('StartScan', '{scanId} ' + _ENVIRONMENT + ' Vessels {numVessels} Pods {numPods}'),
+    ('StartWhaleScan',),
+    ('EndScan',),
+    ('StartVesselScan',),
+    ('EndVesselScan',),
+    ('StartFocalSession',
+        '{sessionId} ' + _POD + ' '
+        'Or {orientation} {speed} '
         'Env {visibility} {beaufort} {swellHeight} '
         'Dist {numVessels} {aircraftDisturbance} {playbackType}'),
-    'EndFocalSession': _ndt('EndFocalSession*'),
-    'StartPlayback': _ndt('StartPlayback*'),
-    'EndPlayback': _ndt('EndPlayback*'),   
-    'Environment': _ndt(
-        'Environment* Visibility {visibility} Beaufort {beaufort} Swell {swellHeight}'),
-    'Behavior': _ndt('Behavior* {code} {behavior} Pod {podId} {individualId}'),
-    'PodEvent': _ndt('PodEvent* {code} {event} Pod {podId}'),
-    'Lag': _ndt('Lag* {lag}'),
-    'DeleteLastEntry': _ndt('DeleteLastEntry*'),
-
-}
+    ('StartPlayback',),
+    ('EndPlayback',),
+    ('EndFocalSession',),
+    ('Orientation', '{orientation} Speed {speed}'),
+    ('Environment', _ENVIRONMENT),
+    ('Confidence', '{confidence}'),
+    ('BinocularFix', _OBJECT + ' Ret {reticle} Az {azimuth} ' + _BEHAVIORAL_STATE),
+    ('TheoData', _DEC_AZ),
+    ('Fix', _DEC_AZ + ' ' + _OBJECT + ' ' + _BEHAVIORAL_STATE),
+    ('Sighting', 'Observer {observerId} ' + _OBJECT + ' ' + _BEHAVIORAL_STATE),   
+    ('Behavior', '{code} {behavior} ' + _POD + ' {individualId}'),
+    ('BehavioralState', '{state} ' + _POD),
+    ('BehaviorsSynchronous',),
+    ('BehaviorsAsynchronous', '{numSurfaceWhales}'),
+    ('PodEvent', _EVENT + ' ' + _POD),
+    ('VesselEvent', _EVENT + ' Vessel {vesselId}'),
+    ('Affiliation', 'First {oldPodId1} Second {oldPodId2} New {newPodId}'),
+    ('Disaffiliation', 'Old {oldPodId} First {newPodId1} Second {newPodId2}'),
+    ('SuspectedAffiliation',),
+    ('SuspectedDisaffiliation',),
+    ('FocalPodLost',),
+    ('Lag', '{lag}'),
+    ('DeleteLastEntry',),
+    ('DeleteLastSequence',),
+    ('EyepieceHeight', '{height}'),
+    ('BubbleCheck',),
+    ('Rebalance',),
+    ('TideHeight', '{height}'),
+    ('ClosestApproach', _OBJECT + ' ' + _POD),
+    ('SurfacingNumber', '{surfacingNum}')
+    
+]])
 
 
 _fieldFormats = {

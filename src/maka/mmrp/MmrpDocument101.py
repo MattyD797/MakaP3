@@ -98,10 +98,6 @@ forms = {
 # arguments would override default parameter values) to arrive at field parameters.
 
 
-# TODO: Complete field and observation definitions to include everything in old grammar.
-# TODO: Check units of all fields.
-
-
 class Angle(Float):
     pass
 
@@ -133,64 +129,6 @@ class Azimuth(Float):
     MAX_INCLUSIVE = False
         
         
-# TODO: What should reticle range be?
-class Reticle(Decimal):
-    UNITS = 'reticle number'
-    MIN = '0'
-        
-      
-'''  
-observerTranslations = {
-    'Adam': 'asf',
-    'adam': 'asf',
-    'Chris': 'cmg',
-    'chris': 'cmg',
-    'Yin': 'sey',
-    'yin': 'sey',
-    'Susan': 'shr',
-    'susan': 'shr'
-}
-
-
-TObserver: Role.observer
-TRole: Role.role
-TObjectType: {BinocularFix, Fix, Sighting, ClosestApproach}.objectType
-TIndividual: Behavior.individualId
-TBehavioralState: {BinocularFix, Fix, Sighting}.behavioralState, BehavioralState.state
-TBehavior: Behavior.behavior
-'''
-
-
-_observerInitialsTranslations = {
-    'Adam': 'asf',
-    'adam': 'asf',
-    'Chris': 'cmg',
-    'chris': 'cmg',
-    'Yin': 'sey',
-    'yin': 'sey',
-    'Susan': 'shr',
-    'susan': 'shr'
-}
-
-
-class ObserverInitials(String):
-    TRANSLATIONS = _observerInitialsTranslations
-    
-    
-# TODO: Should values be restricted? Most in 2013 data are 'Pod', 'Vessel', 'Reference',
-# or 'Buoy', but there are others like 'P' and 'z' as well.
-class ObjectType(String):
-    pass
-        
-        
-class Id(Integer):
-    MIN = 0
-        
-        
-class Count(Integer):
-    MIN = 0
-        
-        
 class Visibility(Integer):
     MIN = 0
     MAX = 6
@@ -204,28 +142,171 @@ class Beaufort(Integer):
 class SwellHeight(Decimal):
     UNITS = 'meters'
     MIN = '0'
-        
-        
-# TODO: Restrict values?
-class BehavioralState(String):
-    pass
-        
-        
-class Numbered(Observation):
-    observationNum = Integer(doc='the number of this observation')
     
     
-class TimeStamped(Observation):
-    date = Date(doc = 'the date of this observation')
-    time = Time(doc = 'the time of this observation')
-   
+class Orientation_(Integer):
+    UNITS = 'degrees clockwise from magnetic north'
+    MIN = 0
+    MAX = 359
     
-class Ndt(Numbered, TimeStamped):
-    pass
+    
+class Speed(Integer):
+    MIN = 0
+    MAX = 3
+        
+        
+'''  
+TObserver: Role.observer
+TRole: Role.role
+TObjectType: {BinocularFix, Fix, Sighting, ClosestApproach}.objectType
+TIndividual: Behavior.individualId
+TBehavioralState: {BinocularFix, Fix, Sighting}.behavioralState, BehavioralState.state
+TBehavior: Behavior.behavior
+'''
 
 
+class ObserverInitials(String):
+    TRANSLATIONS = {
+        'Adam': 'asf',
+        'adam': 'asf',
+        'Chris': 'cmg',
+        'chris': 'cmg',
+        'Yin': 'sey',
+        'yin': 'sey',
+        'Susan': 'shr',
+        'susan': 'shr'
+    }
+    
+    
+class Role_(String):
+    TRANSLATIONS = {
+        'o': 'Observer',
+        't': 'Theodolite operator',
+        'c': 'Computer operator',
+        'n': 'Notetaker',
+        'm': 'Map reticle person'
+    }
+    
+    
+class ObjectType(String):
+    TRANSLATIONS = {
+        'p': 'Pod',
+        'v': 'Vessel',
+        's': 'Spinner pod',
+        'b': 'Tursiops Pod',    # "Pod" was capitalized in Aardvark grammar
+        't': 'Turtle Pod',      # "Pod" was capitalized in Aardvark grammar
+        'r': 'Reference',
+        'o': 'Other'
+    }
+    
+    
+class Individual(String):
+    
+    TRANSLATIONS = {
+        
+        '1': 'Adult',
+        '2': 'Mom',
+        '3': 'Calf',
+        '4': 'Escort',
+        
+        'a': 'Adult',
+        'm': 'Mom',
+        'c': 'Calf',
+        'e': 'Escort'
+    
+    }
+    
+    
+class BehavioralState_(String):
+    
+    TRANSLATIONS = {
+        
+        '1': 'rest',
+        '2': 'mill',
+        '3': 'trav',
+        '4': 'stat',
+        '5': 'sact',
+        '6': 'unkn',
+        '7': 'wwatch',
+        
+        'r': 'rest',
+        'm': 'mill',
+        't': 'trav',
+        's': 'stat',
+        'a': 'sact',
+        'u': 'unkn',
+        'w': 'wwatch'
+    
+    }
+    
+    
+class Behavior_(String):
+    
+    TRANSLATIONS = {
+                    
+        # respiration
+        'fs': 'First surface with no blow',
+        'f':  'First surface blow',
+        'nf': 'Not first surfacing',
+        'b':  'Blow',
+        'n':  'No blow rise',
+        'm':  'Missed blow(s)?',
+        
+        # submergence
+        's':  'Slip under',
+        'a':  'Peduncle arch',
+        'd':  'Fluke down dive',
+        'u':  'Fluke up dive',
+        'sq': 'Unidentified submergence',
+        
+        # non-respiratory markers
+        'nr': 'Missed non-respiratory behavior(s)?',
+        'ub': 'Unidentified behavior',
+        'ms': 'Missed surfacing',
+    
+        # subsurface exhalations    
+        'nr': 'Bubble cloud',
+        'bt': 'Linear bubble trail',
+        
+        # whale vocalizations
+        'tb': 'Trumpet blow',
+        'sr': 'Singing reported',
+        'ss': 'Sideslap',
+        
+        # head and leaping behaviors
+        'hr': 'Head rise',
+        'hl': 'Head lunge',
+        'mb': 'Motor boating',
+        'hs': 'Head slap',
+        'br': 'Breach',
+        'us': 'Unidentified large splash',
+        'oh': 'Other head Behavior',    # "Behavior" was capitalized in Aardvark grammar
+        'ap': 'Airplane',
+        'h':  'Helicopter',
+        
+        # tail behaviors
+        'te': 'Tail extension',
+        'ts': 'Tail slap',
+        'ls': 'Lateral tail slap',
+        'sw': 'Tail swish',
+        'lt': 'Lateral tail display',
+        'ot': 'Other tail behavior',
+        
+        # pectoral fin behaviors
+        'pe': 'Pec extension',
+        'ps': 'Pec slap',
+        'rp': 'Rolling pec slap',
+        'op': 'Other pec behavior',
+        
+        # body contact
+        'sb': 'Strike with body part',
+        'wc': 'Whale body contact'
+        
+    }
+        
+        
 class Station(Observation):
-    id = Id
+    id = Integer
     name = String
     latitudeDegrees = Integer(units='degrees north of equator', min=-90, max=90)
     latitudeMinutes = Decimal(units='minutes', min='0', max='60', maxInclusive=False)
@@ -235,172 +316,246 @@ class Station(Observation):
     magneticDeclination = Angle(units='degrees clockwise from geographic north')
     
     
+class Observer(Observation):
+    initials = ObserverInitials
+    name = String
+    
+    
 class Theodolite(Observation):
-    id = Id
+    id = Integer
     name = String
     azimuthOffset = Angle(units='degrees')
     declinationOffset = Angle(units='degrees')
     
     
 class Reference(Observation):
-    id = Id
+    id = Integer
     name = String
-    azimuth = Azimuth
+    azimuth = Azimuth(units='degrees clockwise from magnetic north')
     
     
-class Observer(Observation):
-    initials = ObserverInitials
-    name = String
+class _Numbered(Observation):
+    observationNum = Integer(doc='the number of this observation')
     
     
-class Pod(Observation):
-    id = Id
-    numWhales = Count
-    numCalves = Count
-    numSingers = Count
+class _TimeStamped(Observation):
+    date = Date(doc='the date of this observation')
+    time = Time(doc='the time of this observation')
+   
     
-    
-# TODO: Why are vessel observations Ndts?
-class Vessel(Ndt):
-    id = Id
-    type = String
-    
-    
-class Start(Ndt):
+class _Ndt(_Numbered, _TimeStamped):
     pass
 
 
-class End(Ndt):
+class Role(_Ndt):
+    observer = ObserverInitials
+    role = Role_
+    
+    
+class Start(_Ndt):
     pass
 
 
-class Comment(Ndt):
-    id = Id
+class End(_Ndt):
+    pass
+
+
+class Comment(_Ndt):
+    id = Integer
     text = String
     
     
-# TODO: Is eyepiece height in centimeters or inches?
-class EyepieceHeight(Ndt):
-    eyepieceHeight = Decimal(units='centimeters', min='0')
+class Pod(Observation):
+    id = Integer
+    numWhales = Integer
+    numCalves = Integer
+    numSingers = Integer
     
     
-class BubbleCheck(Ndt):
+class Vessel(_Ndt):
+    id = Integer
+    type = Integer
+    
+    
+class Environment(_Ndt):
+    visibility = Visibility
+    beaufort = Beaufort
+    swellHeight = SwellHeight
+
+
+class StartScan(Environment):
+    scanId = Integer
+    numVessels = Integer
+    numPods = Integer
+    
+    
+class StartWhaleScan(_Ndt):
     pass
 
 
-class Rebalance(Ndt):
+class EndScan(_Ndt):
     pass
 
 
-class Role(Ndt):
-    observer = ObserverInitials
-    role = String         # TODO: Restrict values?
+class StartVesselScan(_Ndt):
+    pass
+
+
+class EndVesselScan(_Ndt):
+    pass
+
+
+class Orientation(_Ndt):
+    orientation = Orientation_
+    speed = Speed
     
     
-class TheoData(Ndt):
+class StartFocalSession(Environment, Orientation):
+    sessionId = Integer
+    podId = Integer
+    numVessels = Integer(units='number of vessels in arena')
+    aircraftDisturbance = Integer(units='number of CPAs')
+    playbackType = Integer(min=0, max=1)
+    
+    
+class StartPlayback(_Ndt):
+    pass
+
+   
+class EndPlayback(_Ndt):
+    pass
+
+   
+class EndFocalSession(_Ndt):
+    pass
+
+   
+class Confidence(_Ndt):
+    confidence = Integer(min=1, max=6)
+    
+    
+class BinocularFix(_Ndt):
+    objectType = ObjectType
+    objectId = Integer
+    reticle = Decimal
+    azimuth = Decimal(units='degrees clockwise from magnetic north', min='0', max='360', maxInclusive=False)
+    behavioralState = BehavioralState_
+    
+    
+class TheoData(_Ndt):
     declination = Declination
     azimuth = Azimuth
     
     
-class Fix(Ndt):
-    
-    declination = Declination(
-        doc='the declination of this fix in degrees from the zenith, in the range [0, 180]')
-              
-    azimuth = Azimuth(
-        doc='the azimuth of this fix in degrees clockwise from zero, in the range [0, 360)')
-              
-    objectType = ObjectType(doc='the type of the object of this fix')
-        
-    objectId = Id(doc='the ID of the object of this fix')
-    
-    behavioralState = String(doc='the behavioral state of the object of this fix')
-
-
-# TODO: What are azimuth units here?
-class BinocularFix(Ndt):
+class Fix(_Ndt):
+    declination = Declination    
+    azimuth = Azimuth
     objectType = ObjectType
-    objectId = Id
-    reticle = Reticle
-    azimuth = Decimal(units='degrees clockwise from magnetic north', min='0', max='360', maxInclusive=False)
-    behavioralState = BehavioralState
+    objectId = Integer
+    behavioralState = BehavioralState_
+
+
+class Sighting(_Ndt):
+    observerId = String
+    objectType = ObjectType
+    objectId = Integer
+    behavioralState = BehavioralState_
     
     
-class StartScan(Ndt):
-    id = Id
-    visibility = Visibility
-    beaufort = Beaufort
-    swellHeight = SwellHeight
-    numVessels = Count
-    numPods = Count
-    
-    
-class EndScan(Ndt):
-    pass
-
-
-class StartVesselScan(Ndt):
-    pass
-
-
-class EndVesselScan(Ndt):
-    pass
-
-
-class StartFocalSession(Ndt):
-    sessionId = Id
-    podId = Id
-    orientation = Integer(min=0, max=359)
-    speed = Integer(min=0, max=3)
-    visibility = Visibility
-    beaufort = Beaufort
-    swellHeight = SwellHeight
-    numVessels = Count
-    aircraftDisturbance = Count
-    playbackType = Integer(min=0, max=1)
-    
-    
-class EndFocalSession(Ndt):
-    pass
-
-
-class StartPlayback(Ndt):
-    pass
-
-
-class EndPlayback(Ndt):
-    pass
-
-
-class Environment(Ndt):
-    visibility = Visibility
-    beaufort = Beaufort
-    swellHeight = SwellHeight
-    
-
-# TODO: Restrict values of code, behavior, and individual_id.
-class Behavior(Ndt):
+class Behavior(_Ndt):
     code = String
-    behavior = String
-    podId = Id
-    individualId = String
+    behavior = Behavior_
+    podId = Integer
+    individualId = Individual
     
     
-# TODO: Restrict values of code and event?
-class PodEvent(Ndt):
+class BehavioralState(_Ndt):
+    state = BehavioralState_
+    podId = Integer
+    
+    
+class BehaviorsSynchronous(_Ndt):
+    pass
+
+
+class BehaviorsAsynchronous(_Ndt):
+    numSurfaceWhales = Integer
+    
+    
+class PodEvent(_Ndt):
     code = String
     event = String
-    podId = Id
+    podId = Integer
     
-
-class Lag(Ndt):
-    lag = Decimal(default='3')
-
-
-class DeleteLastEntry(Ndt):
+    
+class VesselEvent(_Ndt):
+    code = String
+    event = String
+    vesselId = Integer
+    
+    
+class Affiliation(_Ndt):
+    oldPodId1 = Integer
+    oldPodId2 = Integer
+    newPodId = Integer
+    
+    
+class Disaffiliation(_Ndt):
+    oldPodId = Integer
+    newPodId1 = Integer
+    newPodId2 = Integer
+    
+    
+class SuspectedAffiliation(_Ndt):
     pass
 
 
+class SuspectedDisaffiliation(_Ndt):
+    pass
+
+
+class FocalPodLost(_Ndt):
+    pass
+
+
+class Lag(_Ndt):
+    lag = Decimal(units='seconds', default='3')
+    
+    
+class DeleteLastEntry(_Ndt):
+    pass
+
+
+class DeleteLastSequence(_Ndt):
+    pass
+
+
+class EyepieceHeight(_Ndt):
+    height = Decimal(units='inches', min='0')
+    
+    
+class BubbleCheck(_Ndt):
+    pass
+
+
+class Rebalance(_Ndt):
+    pass
+
+
+class TideHeight(_Ndt):
+    height = Decimal(units='meters')
+    
+    
+class ClosestApproach(_Ndt):
+    objectType = ObjectType
+    objectId = Integer
+    podId = Integer
+    
+    
+class SurfacingNumber(_Ndt):
+    surfacingNum = Integer
+    
+    
 class MmrpDocument101(object):
     
     
@@ -409,12 +564,22 @@ class MmrpDocument101(object):
     observationClasses = frozenset([
         Station, Theodolite, Reference, Observer, Pod, Vessel, Start, End, Comment,
         EyepieceHeight, BubbleCheck, Rebalance, Role, TheoData, Fix, BinocularFix,
-        StartScan, EndScan, StartVesselScan, EndVesselScan,
+        StartScan, StartWhaleScan, EndScan, StartVesselScan, EndVesselScan,
         StartFocalSession, EndFocalSession, StartPlayback, EndPlayback,
-        Environment, Behavior, PodEvent, Lag, DeleteLastEntry])
+        Orientation, Environment, Behavior, PodEvent, Lag, DeleteLastEntry])
+    
+    observationClasses = frozenset([
+        Station, Observer, Theodolite, Reference, Role, Start, End, Comment, Pod, Vessel,
+        Environment, StartScan, StartWhaleScan, EndScan, StartVesselScan, EndVesselScan,
+        Orientation, StartFocalSession, StartPlayback, EndPlayback, EndFocalSession, Confidence,
+        BinocularFix, TheoData, Fix, Sighting, Behavior, BehavioralState, BehaviorsSynchronous,
+        BehaviorsAsynchronous, PodEvent, VesselEvent, Affiliation, Disaffiliation,
+        SuspectedAffiliation, SuspectedDisaffiliation, FocalPodLost, Lag, DeleteLastEntry,
+        DeleteLastSequence, EyepieceHeight, BubbleCheck, Rebalance, TideHeight, ClosestApproach,
+        SurfacingNumber])
     
     fieldClasses = frozenset([
-        Azimuth, Count, Date, Declination, Decimal, Id, Integer, String, ObjectType, Time])
+        Azimuth, Date, Declination, Decimal, Integer, String, ObjectType, Time])
     
     
     def __init__(self, observations=None, filePath=None, fileFormat=None):
