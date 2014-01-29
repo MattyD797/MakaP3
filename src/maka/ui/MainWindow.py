@@ -22,9 +22,7 @@ import maka.util.ExtensionManager as ExtensionManager
 '''
 RESUME
 
-* Commands
-* Complete MMRP observation classes, document format, and commands.
-* Unsaved data quit dialog.
+* Open and save as dialog paths: preference for default, remember last.
 * Auto-save
 * Reminders
 * Reduction
@@ -298,11 +296,13 @@ class MainWindow(QMainWindow):
         
         doc = self.document
         
-        if doc is None or doc.filePath is None:
+        if doc is None:
             suffix = ''
+            
         else:
+            name = 'Untitled' if doc.filePath is None else os.path.basename(doc.filePath)
             modified = '' if doc.saved else '*'
-            suffix = ': ' + os.path.basename(doc.filePath) + modified
+            suffix = ': ' + name + modified
         
         self.setWindowTitle('Maka' + suffix)
             
@@ -357,16 +357,19 @@ class MainWindow(QMainWindow):
             
         
     def _onNew(self):
-        self._setDocument(_createNewDocument())
+        if self._isCloseOk():
+            self._setDocument(_createNewDocument())
         
         
     def _onOpen(self):
         
-        filePath, _ = \
-            QFileDialog.getOpenFileName(self, 'Open File', '/Users/Harold/Desktop/Maka')
+        if self._isCloseOk():
             
-        if filePath != '':
-            self.openDocumentFile(filePath)
+            filePath, _ = \
+                QFileDialog.getOpenFileName(self, 'Open File', '/Users/Harold/Desktop/Maka')
+                
+            if filePath != '':
+                self.openDocumentFile(filePath)
             
             
     def openDocumentFile(self, filePath):
@@ -388,10 +391,10 @@ class MainWindow(QMainWindow):
         doc = self.document
         
         if doc.filePath is None:
-            self._onSaveAs()
+            return self._onSaveAs()
             
         else:
-            self._writeDocumentFile(doc.filePath)
+            return self._writeDocumentFile(doc.filePath)
             
             
     def _writeDocumentFile(self, filePath):
@@ -399,17 +402,18 @@ class MainWindow(QMainWindow):
         doc = self.document
         
         try:
-            # TODO: How to test this? What exceptions can be raised?
             doc.fileFormat.writeDocument(doc, filePath, doc.documentFormat)
             
         except Exception, e:
             message = 'File save failed.\n\n' + str(e)
             QMessageBox.critical(self, '', message)
+            return False
             
         else:
             doc.filePath = filePath
             doc.markSaved()
             self._updateUi()
+            return True
         
         
     def _onSaveAs(self):
@@ -419,10 +423,12 @@ class MainWindow(QMainWindow):
         else:
             dirPath = ''
             
-        filePath, _ = QFileDialog.getSaveFileName(self, 'Save Document to File', dirPath)
+        filePath, _ = QFileDialog.getSaveFileName(self, 'Save Document', dirPath)
             
-        if filePath != '':
-            self._writeDocumentFile(filePath)
+        if filePath == '':
+            return False
+        else:
+            return self._writeDocumentFile(filePath)
         
         
     def _onUndo(self):
@@ -529,6 +535,45 @@ class MainWindow(QMainWindow):
     def _onDeselectAll(self):
         self._obsList.clearSelection()
         
+        
+    def closeEvent(self, event):
+        if not self._isCloseOk():
+            event.ignore()
+            
+            
+    def _isCloseOk(self):
+        
+        doc = self.document
+        
+        if doc.saved:
+            return True
+        
+        else:
+            # current document has unsaved changes
+            
+            if doc.filePath is None:
+                prefix = 'This document'
+            else:
+                fileName = os.path.basename(doc.filePath)
+                prefix = 'The document "{:s}"'.format(fileName)
+                
+            box = QMessageBox()
+            box.setText(prefix + ' has unsaved changes.')
+            box.setInformativeText('Would you like to save them before closing?')
+            box.setStandardButtons(QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
+            box.setDefaultButton(QMessageBox.Save)
+            
+            result = box.exec_()
+            
+            if result == QMessageBox.Save:
+                return self._onSave()
+            
+            elif result == QMessageBox.Cancel:
+                return False
+            
+            else:
+                return True
+
         
 def _stripEllipsis(s):
     return s if not s.endswith('...') else s[:-3]
