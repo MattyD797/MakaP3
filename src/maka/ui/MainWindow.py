@@ -68,6 +68,9 @@ class MainWindow(QMainWindow):
         
         self._createUi()
         
+        self._openFileDialogShown = False
+        self._saveAsFileDialogShown = False
+        
         self.statusBar()
         
         width = prefs.get('mainWindow.width', 600)
@@ -365,13 +368,38 @@ class MainWindow(QMainWindow):
         
         if self._isCloseOk():
             
-            filePath, _ = \
-                QFileDialog.getOpenFileName(self, 'Open File', '/Users/Harold/Desktop/Maka')
+            dirPath = self._getOpenFileDialogDirPath()
+                
+            filePath, _ = QFileDialog.getOpenFileName(self, 'Open File', dirPath)
+            
+            self._openFileDialogShown = True
                 
             if filePath != '':
                 self.openDocumentFile(filePath)
             
             
+    def _getOpenFileDialogDirPath(self):
+        return self._getFileDialogDirPath(self._openFileDialogShown, 'openFileDialog.dirPath')
+    
+    
+    def _getFileDialogDirPath(self, dialogShown, prefName):
+        
+        if dialogShown:
+            # dialog has already been shown
+            
+            return ''
+            
+        else:
+            # dialog has not already been shown
+            
+            try:
+                return prefs[prefName]
+                
+            except KeyError:
+                dirPath = os.path.expanduser('~')
+                return dirPath if dirPath != '~' else ''
+                    
+        
     def openDocumentFile(self, filePath):
         
         try:
@@ -418,12 +446,11 @@ class MainWindow(QMainWindow):
         
     def _onSaveAs(self):
         
-        if self.document.filePath is not None:
-            dirPath = os.path.dirname(self.document.filePath)
-        else:
-            dirPath = ''
-            
+        dirPath = self._getSaveAsFileDialogDirPath()
+        
         filePath, _ = QFileDialog.getSaveFileName(self, 'Save Document', dirPath)
+        
+        self._saveAsFileDialogShown = True
             
         if filePath == '':
             return False
@@ -431,6 +458,16 @@ class MainWindow(QMainWindow):
             return self._writeDocumentFile(filePath)
         
         
+    def _getSaveAsFileDialogDirPath(self):
+        
+        if self.document.filePath is not None:
+            return os.path.dirname(self.document.filePath)
+            
+        else:
+            return self._getFileDialogDirPath(
+                self._saveAsFileDialogShown, 'saveAsFileDialog.dirPath')
+            
+            
     def _onUndo(self):
         edit = self.document.undo()
         n = len(edit.newObservations)

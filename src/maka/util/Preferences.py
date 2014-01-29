@@ -15,12 +15,14 @@ def _loadPreferences():
     "mainWindow.width": 600,
     "mainWindow.height": 500,
     "observationDialog.width": 400,
-    "defaultDocumentFilePath": "/Users/Harold/Desktop/Stuff/Maka/Test Document.txt",
+#    "defaultDocumentFilePath": "/Users/Harold/Desktop/Stuff/Maka/Test Document.txt",
+#    "openFileDialog.dirPath": "/Users/Harold/Desktop/Stuff/Maka",
+#    "saveAsFileDialog.dirPath": "/Users/Harold/Desktop/Stuff/Maka",
     "devices": {
         "Theodolite": {
 #            "deviceType": "Dummy Theodolite"
-             "deviceType": "Sokkia DT500 Theodolite",
-             "deviceConfig": { "serialPortName": "/dev/cu.usbserial" }
+            "deviceType": "Sokkia DT500 Theodolite",
+            "deviceConfig": { "serialPortName": "/dev/cu.usbserial" }
         }
     }
 }
