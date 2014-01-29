@@ -140,14 +140,22 @@ def _getCommentId(obs):
 _Interpreter = MmrpCommandInterpreter101
 
 
-_commandNum = 0
+class _CommandNameGenerator(object):
+    
+    def __init__(self):
+        self._commandNum = -1
+        
+    def generateCommandName(self):
+        self._commandNum += 1
+        return '_Command{:03d}'.format(self._commandNum)
+    
+    
+_commandNameGenerator = _CommandNameGenerator()
 
 
 def _command(format, obsClass, bases=(SimpleCommand,), defaultFieldValues=None):
     
-    global _commandNum
-    name = '_Command{:03d}'.format(_commandNum)
-    _commandNum += 1
+    name = _commandNameGenerator.generateCommandName()
     
     attrs = {
         'observationClass': obsClass,
@@ -182,20 +190,28 @@ def _fix(commandName, objectType):
     return _ndt(format, Fix, defaultFieldValues)
 
 
-# TODO: Set `code` field to concatenation of `code` argument and `str(podId)`.
-def _beh(code, behavior):
+def _behaviorFieldValuesHook(self, fieldValues):
+    id = fieldValues['individualId']
+    if id is not None:
+        fieldValues['code'] += str(id)
+    return fieldValues
+
+
+def _behavior(code, behavior):
     format = code + ' individualId podId'
     defaultFieldValues = {'code': code, 'behavior': behavior}
-    return _ndt(format, Behavior, defaultFieldValues)
+    cls = _ndt(format, Behavior, defaultFieldValues)
+    cls._fieldValuesHook = _behaviorFieldValuesHook
+    return cls
 
 
-def _bst(name, state=None):
+def _behavioralState(name, state=None):
     format = name + ' podId'
     if state is None: state = name
     return _ndt(format, BehavioralState, {'state': state})
 
 
-def _pev(code, event):
+def _podEvent(code, event):
     return _objectEvent(code, event, 'pod', PodEvent)
     
     
@@ -205,11 +221,11 @@ def _objectEvent(code, event, objectName, obsClass):
     return _ndt(format, obsClass, defaultFieldValues)
 
 
-def _vev(code, event):
+def _vesselEvent(code, event):
     return _objectEvent(code, event, 'vessel', VesselEvent)
 
 
-def _cpa(name, objectType):
+def _closestApproach(name, objectType):
     format = name + ' objectId podId'
     return _ndt(format, ClosestApproach, {'objectType': objectType})
 
@@ -273,94 +289,94 @@ _commandClasses = [
     # individual behaviors
     
     # respiration
-    _beh('fs', 'First surface with no blow'),
-    _beh('f',  'First surface blow'),
-    _beh('nf', 'Not first surfacing'),
-    _beh('b',  'Blow'),
-    _beh('n',  'No blow rise'),
-    _beh('m',  'Missed blow(s)?'),
+    _behavior('fs', 'First surface with no blow'),
+    _behavior('f',  'First surface blow'),
+    _behavior('nf', 'Not first surfacing'),
+    _behavior('b',  'Blow'),
+    _behavior('n',  'No blow rise'),
+    _behavior('m',  'Missed blow(s)?'),
 
     # submergence
-    _beh('s',  'Slip under'),
-    _beh('a',  'Peduncle arch'),
-    _beh('d',  'Fluke down dive'),
-    _beh('u',  'Fluke up dive'),
-    _beh('sq', 'Unidentified submergence'),
+    _behavior('s',  'Slip under'),
+    _behavior('a',  'Peduncle arch'),
+    _behavior('d',  'Fluke down dive'),
+    _behavior('u',  'Fluke up dive'),
+    _behavior('sq', 'Unidentified submergence'),
 
     # non-respiratory markers
-    _beh('nr', 'Missed non-respiratory behavior(s)?'),
-    _beh('ub', 'Unidentified behavior'),
-    _beh('ms', 'Missed surfacing'),
+    _behavior('nr', 'Missed non-respiratory behavior(s)?'),
+    _behavior('ub', 'Unidentified behavior'),
+    _behavior('ms', 'Missed surfacing'),
 
     # subsurface exhalations
-    _beh('bc', 'Bubble cloud'),
-    _beh('bt', 'Linear bubble trail'),
+    _behavior('bc', 'Bubble cloud'),
+    _behavior('bt', 'Linear bubble trail'),
 
     # whale vocalizations
-    _beh('tb', 'Trumpet blow'),
-    _beh('sr', 'Singing reported'),
-    _beh('ss', 'Sideslap'),
+    _behavior('tb', 'Trumpet blow'),
+    _behavior('sr', 'Singing reported'),
+    _behavior('ss', 'Sideslap'),
 
     # head and leaping behaviors
-    _beh('hr', 'Head rise'),
-    _beh('hl', 'Head lunge'),
-    _beh('mb', 'Motorboating'),
-    _beh('hs', 'Head slap'),
-    _beh('br', 'Breach'),
-    _beh('us', 'Unidentified large splash'),
-    _beh('oh', 'Other head behavior'),
-    _beh('ap', 'Airplane'),
-    _beh('h',  'Helicopter'),
+    _behavior('hr', 'Head rise'),
+    _behavior('hl', 'Head lunge'),
+    _behavior('mb', 'Motorboating'),
+    _behavior('hs', 'Head slap'),
+    _behavior('br', 'Breach'),
+    _behavior('us', 'Unidentified large splash'),
+    _behavior('oh', 'Other head behavior'),
+    _behavior('ap', 'Airplane'),
+    _behavior('h',  'Helicopter'),
 
     # tail behaviors
-    _beh('te', 'Tail extension'),
-    _beh('ts', 'Tail slap'),
-    _beh('ls', 'Lateral tail slap'),
-    _beh('sw', 'Tail swish'),
-    _beh('lt', 'Lateral tail display'),
-    _beh('ot', 'Other tail behavior'),
+    _behavior('te', 'Tail extension'),
+    _behavior('ts', 'Tail slap'),
+    _behavior('ls', 'Lateral tail slap'),
+    _behavior('sw', 'Tail swish'),
+    _behavior('lt', 'Lateral tail display'),
+    _behavior('ot', 'Other tail behavior'),
     
     # pectoral fin behaviors
-    _beh('pe', 'Pec extension'),
-    _beh('ps', 'Pec slap'),
-    _beh('rp', 'Rolling pec slap'),
-    _beh('op', 'Other pec behavior'),
+    _behavior('pe', 'Pec extension'),
+    _behavior('ps', 'Pec slap'),
+    _behavior('rp', 'Rolling pec slap'),
+    _behavior('op', 'Other pec behavior'),
 
     # body contact
-    _beh('sb', 'Strike with body part'),
-    _beh('wc', 'Whale body contact'),
+    _behavior('sb', 'Strike with body part'),
+    _behavior('wc', 'Whale body contact'),
 
     # pod behavioral states
-    _bst('rest'),
-    _bst('mill'),
-    _bst('trav'),
-    _bst('stat'),
-    _bst('sact'),
-    _bst('unkn'),
-    _bst('whalewatch'),
-    _bst('1', 'rest'),
-    _bst('2', 'mill'),
-    _bst('3', 'trav'),
-    _bst('4', 'stat'),
-    _bst('5', 'sact'),
-    _bst('6', 'unkn'),
-    _bst('7', 'whalewatch'),
+    _behavioralState('rest'),
+    _behavioralState('mill'),
+    _behavioralState('trav'),
+    _behavioralState('stat'),
+    _behavioralState('sact'),
+    _behavioralState('unkn'),
+    _behavioralState('whalewatch'),
+    _behavioralState('1', 'rest'),
+    _behavioralState('2', 'mill'),
+    _behavioralState('3', 'trav'),
+    _behavioralState('4', 'stat'),
+    _behavioralState('5', 'sact'),
+    _behavioralState('6', 'unkn'),
+    _behavioralState('7', 'whalewatch'),
     
     _ndt('sync', BehaviorsSynchronous),
     _ndt('asyn', BehaviorsAsynchronous),
     
     # pod events
-    _pev('pd',   'Pod decreases speed'),
-    _pev('pi',   'Pod increases speed'),
-    _pev('px',   'Pod stops'),
-    _pev('p45',  'Pod changes direction 45 to 90 degrees'),
-    _pev('p90',  'Pod changes direction 90 to 180 degrees'),
-    _pev('p180', 'Pod changes direction 180 degrees'),
+    _podEvent('pd',   'Pod decreases speed'),
+    _podEvent('pi',   'Pod increases speed'),
+    _podEvent('px',   'Pod stops'),
+    _podEvent('p45',  'Pod changes direction 45 to 90 degrees'),
+    _podEvent('p90',  'Pod changes direction 90 to 180 degrees'),
+    _podEvent('p180', 'Pod changes direction 180 degrees'),
     
     # vessel events
-    _vev('vs', 'Vessel starts'),
-    _vev('vc', 'Vessel changes speed'),
-    _vev('vx', 'Vessel stops'),
+    _vesselEvent('vs', 'Vessel starts'),
+    _vesselEvent('vc', 'Vessel changes speed'),
+    _vesselEvent('vx', 'Vessel stops'),
     
     _ndt('paf oldPodId1 oldPodId2 newPodId', Affiliation),
     _ndt('pds oldPodId newPodId1 newPodId2', Disaffiliation),
@@ -381,9 +397,9 @@ _commandClasses = [
     _ndt('th height', TideHeight),
     
     # closest approaches
-    _cpa('cpav', 'Vessel'),
-    _cpa('cpaa', 'Airplane'),
-    _cpa('cpah', 'Helicopter'),
+    _closestApproach('cpav', 'Vessel'),
+    _closestApproach('cpaa', 'Airplane'),
+    _closestApproach('cpah', 'Helicopter'),
     
     _ndt('sn surfacingNum', SurfacingNumber)
     

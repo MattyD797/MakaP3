@@ -155,7 +155,8 @@ class SimpleCommand(object):
                     
                     fieldValues[key] = value(self._interpreter) if callable(value) else value
                     
-        return fieldValues
+        # TODO: Combine callable value and field values hook mechanisms?
+        return self._fieldValuesHook(fieldValues)
                 
                         
     def _parseArg(self, arg, i):
@@ -172,3 +173,8 @@ class SimpleCommand(object):
                     fieldName, self.name, str(e)))
             
         return fieldName, value
+    
+    
+    def _fieldValuesHook(self, fieldValues):
+        return fieldValues
+    
