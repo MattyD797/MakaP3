@@ -277,8 +277,37 @@ class MainWindow(QMainWindow):
         
         
     def _deleteObservations(self, startIndex, endIndex):
+        
+        # Get index of observation we want at the top of the list after the deletion.
+        scrollIndex = self._getPostDeletionScrollIndex(startIndex, endIndex)
+        
         for _ in xrange(endIndex - startIndex):
             self._obsList.takeItem(startIndex)
+            
+        # Scroll so desired observation is at the top of the list.
+        if scrollIndex is not None:
+            item = self._obsList.item(scrollIndex)
+            self._obsList.scrollToItem(item, QAbstractItemView.PositionAtTop)
+            
+        
+    def _getPostDeletionScrollIndex(self, startIndex, endIndex):
+        
+        item = self._obsList.itemAt(0, 0)
+        index = self._obsList.row(item)
+        
+        if index < startIndex or index >= endIndex:
+            # first visible item will not be deleted
+            
+            return index
+            
+        elif endIndex != self._obsList.count():
+            # first visible item will be deleted, and there are items
+            # after the selection that will not be deleted.
+            
+            return startIndex
+            
+        else:
+            return None
             
         
     def _insertObservations(self, startIndex, numObservations):
