@@ -127,7 +127,7 @@ def _createSerialNumGenerator(doc, getNum, defaultInitialNum=0):
         
         
 def _createCommentIdGenerator(doc):
-    return _createSerialNumGenerator(doc, _getCommentId)
+    return _createSerialNumGenerator(doc, _getCommentId, 1)
 
     
 def _getCommentId(obs):
