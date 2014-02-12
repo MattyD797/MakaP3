@@ -22,7 +22,6 @@ import maka.util.ExtensionManager as ExtensionManager
 '''
 RESUME
 
-* Open and save as dialog paths: preference for default, remember last.
 * Auto-save
 * Reminders
 * Reduction
@@ -238,16 +237,8 @@ class MainWindow(QMainWindow):
             
             if len(changes) != 0:
                 
-                # TODO: Is this the best way to get the name of an observation type?
                 editName = 'Edit ' + obs.__class__.__name__
-                
                 document.edit(editName, index, index + 1, [obs.copy(**changes)])
-                
-                # TODO: Review handling of selections with undo/redo.
-                # Note that currently if one edits an observation and then undoes
-                # and redoes the edit the observation winds up unselected, which
-                # may not be what we want.
-                self._selectObservations(index, index + 1)
         
         
     @property
@@ -271,8 +262,14 @@ class MainWindow(QMainWindow):
         
                 
     def _onDocumentEdit(self, edit):
-        self._deleteObservations(edit.startIndex, edit.endIndex)
-        self._insertObservations(edit.startIndex, len(edit.newObservations))
+        
+        startIndex = edit.startIndex
+        numObservations = len(edit.newObservations)
+        
+        self._deleteObservations(startIndex, edit.endIndex)
+        self._insertObservations(startIndex, numObservations)
+        
+        self._selectObservations(startIndex, numObservations)
         self._updateUi()
         
         
@@ -319,6 +316,28 @@ class MainWindow(QMainWindow):
         self._obsList.insertItems(startIndex, labels)
             
 
+    def _selectObservations(self, startIndex, numObservations):
+        
+        if numObservations > 0:
+            
+            # Select rows.
+            start = self._getModelIndex(startIndex)
+            end = self._getModelIndex(startIndex + numObservations - 1)
+            selection = QItemSelection(start, end)
+            flags = QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
+            self._obsList.selectionModel().select(selection, flags)
+        
+            # Ensure that first row is visible.
+            startItem = self._obsList.item(startIndex)
+            self._obsList.scrollToItem(startItem)
+            
+        
+    def _getModelIndex(self, i):
+        selectionModel = self._obsList.selectionModel()
+        itemModel = selectionModel.model()
+        return itemModel.createIndex(i, 0)
+        
+        
     def _updateUi(self):
         self._updateWindowTitle()
         self._updateMenuItemStates()
@@ -498,26 +517,7 @@ class MainWindow(QMainWindow):
             
             
     def _onUndo(self):
-        edit = self.document.undo()
-        n = len(edit.newObservations)
-        if n > 0:
-            i = edit.startIndex
-            self._selectObservations(i, i + n)
-            self._obsList.scrollToItem(self._obsList.item(i))
-        
-        
-    def _selectObservations(self, startIndex, endIndex):
-        startIndex = self._getModelIndex(startIndex)
-        endIndex = self._getModelIndex(endIndex - 1)
-        selection = QItemSelection(startIndex, endIndex)
-        flags = QItemSelectionModel.ClearAndSelect | QItemSelectionModel.Rows
-        self._obsList.selectionModel().select(selection, flags)
-        
-        
-    def _getModelIndex(self, i):
-        selectionModel = self._obsList.selectionModel()
-        itemModel = selectionModel.model()
-        return itemModel.createIndex(i, 0)
+        self.document.undo()
         
         
     def _onRedo(self):
