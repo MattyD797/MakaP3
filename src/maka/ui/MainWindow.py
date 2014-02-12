@@ -65,6 +65,8 @@ class MainWindow(QMainWindow):
         
         super(MainWindow, self).__init__()
         
+        self._setFontSize()
+        
         self._createUi()
         
         self._openFileDialogShown = False
@@ -79,6 +81,12 @@ class MainWindow(QMainWindow):
         self._setDocument(_createNewDocument())
         
         
+    def _setFontSize(self):
+        fontSize = prefs.get('maka.fontSize')
+        if fontSize is not None:
+            self.setStyleSheet('QWidget {{font: {:d}px}}'.format(fontSize))
+            
+
     def _createUi(self):
         
         self._createActions()

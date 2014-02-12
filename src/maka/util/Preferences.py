@@ -12,6 +12,7 @@ def _loadPreferences():
     try:
         return json.loads(TextUtils.removeComments('''
 {
+#    "maka.fontSize": 16,
     "mainWindow.width": 600,
     "mainWindow.height": 500,
     "observationDialog.width": 400,
