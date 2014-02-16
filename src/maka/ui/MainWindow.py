@@ -55,6 +55,8 @@ _EDIT_MENU_SCHEMA = '''
     Delete
     Select All
     Deselect All
+    
+    Swap Angles
 '''
 
 
@@ -126,7 +128,9 @@ class MainWindow(QMainWindow):
             ('Delete', self._onDelete, 'Backspace', 'Delete selected observations'),
             
             ('Select All', self._onSelectAll, 'Ctrl+A', 'Select all observations'),
-            ('Deselect All', self._onDeselectAll, 'Shift+Ctrl+A', 'Deselect all observations')
+            ('Deselect All', self._onDeselectAll, 'Shift+Ctrl+A', 'Deselect all observations'),
+            
+            ('Swap Angles', self._onSwapAngles, 'Ctrl+L', 'Swap vertical and horizontal angles')
             
         )
         
@@ -193,10 +197,6 @@ class MainWindow(QMainWindow):
         return widget
         
         
-    # TODO: When observation list has keyboard focus and the user pressed a non-control
-    # key, shift focus to command line and deliver key press event to it.
-    
-    
     def _onCommandLineReturnPressed(self):
         
         command = self._commandLine.text()
@@ -610,6 +610,19 @@ class MainWindow(QMainWindow):
         self._obsList.clearSelection()
         
         
+    def _onSwapAngles(self):
+        observations = [self._swapAngles(obs) for obs in self.document.observations]
+        self.document.edit('Swap Angles', 0, len(observations), observations)
+
+
+    def _swapAngles(self, obs):
+        name = obs.__class__.__name__
+        if name == 'TheoData' or name == 'Fix':
+            return obs.copy(azimuth=obs.declination, declination=obs.azimuth)
+        else:
+            return obs.copy()
+    
+        
     def closeEvent(self, event):
         if not self._isCloseOk():
             event.ignore()
@@ -721,4 +734,3 @@ class ObservationListWidget(QListWidget):
     def focusOutEvent(self, event):
         super(ObservationListWidget, self).focusOutEvent(event)
         self._mainWindow._updateMenuItemStates()
-    

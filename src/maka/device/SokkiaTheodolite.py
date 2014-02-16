@@ -270,6 +270,6 @@ class SokkiaDt500Theodolite(SokkiaTheodolite):
             parity='None',
             numStopBits=1,
             readCommand='\x00',
-            dataFormat='hv',
+            dataFormat='vh',
             readTimeout=readTimeout,
             writeTimeout=writeTimeout)
