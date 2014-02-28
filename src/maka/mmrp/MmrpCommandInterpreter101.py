@@ -178,6 +178,12 @@ def _ndt(format, obsClass, defaultFieldValues=None):
     return _command(format, obsClass, (_Ndt,), defaultFieldValues)
     
     
+def _binocularFix(commandName, objectType):
+    format = commandName + ' objectId azimuth reticle behavioralState'
+    defaultFieldValues = {'objectType': objectType}
+    return _ndt(format, BinocularFix, defaultFieldValues)
+
+
 _fixDefaults = [
     (('date', 'time'), _Interpreter._getSavedDateAndTime),
     (('declination', 'azimuth'), _Interpreter._getSavedTheodoliteAngles)
@@ -268,7 +274,10 @@ _commandClasses = [
     _ndt('env visibility beaufort swellHeight', Environment),
     _ndt('cnf confidence', Confidence),
     
-    _ndt('bf objectType objectId reticle azimuth behavioralState', BinocularFix),
+    # binocular fixes
+    _ndt('bf objectType objectId azimuth reticle behavioralState', BinocularFix),
+    _binocularFix('bp', 'Pod'),
+    _binocularFix('bv', 'Vessel'),
     
     # theodolite fixes
     _ndt('z', TheoData, {
