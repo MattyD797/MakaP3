@@ -125,7 +125,21 @@ class MainWindow(QMainWindow):
             ('Paste', self._onPaste, 'Ctrl+V', 'Paste observations over selection'),
             ('Paste After', self._onPasteAfter, 'Shift+Ctrl+V', 'Paste observations after selection'),
             ('Paste Before', self._onPasteBefore, 'Alt+Ctrl+V', 'Paste observations before selection'),
-            ('Delete', self._onDelete, 'Backspace', 'Delete selected observations'),
+            
+            # I chose not to offer the standard <Backspace> keyboard accelerator
+            # for the delete operation after considering some user feedback.
+            # The HMMC found that they sometimes accidentally deleted selected
+            # observations rather than a command line character because of confusion
+            # about whether the observation list or the command line had keyboard
+            # focus. Since it is very common to want to delete a command character by
+            # pressing the the delete key, but I believe much less common to want to
+            # delete observations with that key, I suspect that not offering the delete
+            # accelerator for the observation list will reduce unpleasant surprises with
+            # minimal inconvenience. The cut operation for the observation list does
+            # nearly the same thing as the delete operation (the only difference being
+            # that cut observations are placed on the clipboard while deleted observations
+            # are not) and the cut operation still has the keyboard accelerator <Ctrl+X>.
+            ('Delete', self._onDelete, None, 'Delete selected observations'),
             
             ('Select All', self._onSelectAll, 'Ctrl+A', 'Select all observations'),
             ('Deselect All', self._onDeselectAll, 'Shift+Ctrl+A', 'Deselect all observations'),
