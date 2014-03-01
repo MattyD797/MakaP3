@@ -562,13 +562,6 @@ class MmrpDocument101(object):
     extensionName = 'MMRP Document 1.01'
     
     observationClasses = frozenset([
-        Station, Theodolite, Reference, Observer, Pod, Vessel, Start, End, Comment,
-        EyepieceHeight, BubbleCheck, Rebalance, Role, TheoData, Fix, BinocularFix,
-        StartScan, StartWhaleScan, EndScan, StartVesselScan, EndVesselScan,
-        StartFocalSession, EndFocalSession, StartPlayback, EndPlayback,
-        Orientation, Environment, Behavior, PodEvent, Lag, DeleteLastEntry])
-    
-    observationClasses = frozenset([
         Station, Observer, Theodolite, Reference, Role, Start, End, Comment, Pod, Vessel,
         Environment, StartScan, StartWhaleScan, EndScan, StartVesselScan, EndVesselScan,
         Orientation, StartFocalSession, StartPlayback, EndPlayback, EndFocalSession, Confidence,
