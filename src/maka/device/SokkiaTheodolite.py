@@ -263,6 +263,12 @@ class SokkiaDt500Theodolite(SokkiaTheodolite):
     
     def __init__(self, serialPortName=None, readTimeout=3, writeTimeout=3):
         
+        # Note that the vertical angle precedes the horizontal angle in data
+        # read from a DT500, contrary to what is indicated on page 23 of the
+        # fourth edition of Sokkia's _DTx00 Series Operator's Manual_. Hence
+        # the `dataFormat` argument is `'vh'` in the following rather than
+        # `'hv'`.
+        
         super(SokkiaDt500Theodolite, self).__init__(
             serialPortName=serialPortName,
             baudRate=1200,
