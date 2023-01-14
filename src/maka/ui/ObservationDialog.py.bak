@@ -1,5 +1,6 @@
-from PySide2.QtCore import QSize
-from PySide2.QtWidgets import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout)
+from PySide.QtCore import QSize
+from PySide.QtGui import (QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout)
+
 from maka.util.Preferences import preferences as prefs
 import maka.util.TextUtils as TextUtils
 
@@ -124,7 +125,7 @@ class ObservationDialog(QDialog):
     def _updateOkButtonState(self):
         
         enabled = True
-        for editor in self._editors.values():
+        for editor in self._editors.itervalues():
             if not editor._valueOk:
                 enabled = False
                 break
@@ -138,7 +139,7 @@ class ObservationDialog(QDialog):
         
         changes = {}
         
-        for fieldName, editor in self._editors.items():
+        for fieldName, editor in self._editors.iteritems():
             
             oldValue = getattr(self._obs, fieldName)
             

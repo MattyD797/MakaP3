@@ -1,4 +1,4 @@
-
+from __future__ import print_function
 
 import os
 
@@ -122,7 +122,7 @@ def main():
                 
                 try:
                     document = fileFormat.readDocument(filePath)
-                except ValueError as e:
+                except ValueError, e:
                     try:
                         getattr(e, 'line_num')
                     except AttributeError:

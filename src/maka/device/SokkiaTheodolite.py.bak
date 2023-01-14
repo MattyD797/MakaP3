@@ -5,7 +5,7 @@ Note that this module depends on the PySerial serial communications Python exten
 '''
 
 
-
+from __future__ import print_function
 
 from maka.device.SerialPort import SerialPort
 from maka.device.TheodoliteError import TheodoliteError

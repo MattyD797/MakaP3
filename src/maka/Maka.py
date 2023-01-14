@@ -1,10 +1,9 @@
 '''Maka application.'''
 
-
-from PySide.QtGui import QApplication
+from PySide2.QtWidgets import QApplication
 import os
 import sys
-    
+ 
 from maka.ui.MainWindow import MainWindow
 from maka.util.Preferences import preferences as prefs
 

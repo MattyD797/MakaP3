@@ -8,7 +8,7 @@ all fields of a new observation, and allows their values to be set via keyword a
 '''
 
 
-
+from __future__ import print_function
 
 from maka.data.Field import Field
 
@@ -112,7 +112,7 @@ class _Metaclass(type):
         fields = _accumulateParentFields(parents)
         fields.update(_getNewFields(attrs))
         
-        names = list(fields.keys())
+        names = fields.keys()
         names.sort()
         attrs[FIELDS_ATTRIBUTE_NAME] = [fields[name] for name in names]
             
@@ -156,7 +156,7 @@ def _getNewFields(attrs):
                 
     fields = {}
     
-    for name, obj in attrs.items():
+    for name, obj in attrs.iteritems():
         
         # TODO: Is it really best to allow field classes as well as instances in
         # observation class definitions? It's a little more concise, but it is also
@@ -178,10 +178,13 @@ def _getNewFields(attrs):
     return fields
 
 
-class Observation(object, metaclass=_Metaclass):
+class Observation(object):
         
         
     '''Superclass of all observation classes.'''
+    
+    
+    __metaclass__ = _Metaclass
     
     
     def __init__(self, **kwds):

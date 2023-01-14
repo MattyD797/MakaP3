@@ -1,7 +1,7 @@
 '''MMRP field and observation classes.'''
 
 
-
+from __future__ import print_function
 
 from maka.data.Field import Date, Decimal, Float, Integer, String, Time
 from maka.data.Observation import Observation

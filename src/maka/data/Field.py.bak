@@ -1,7 +1,7 @@
 '''Observation field classes.'''
 
 
-
+from __future__ import print_function
 
 import datetime
 import re
@@ -205,7 +205,7 @@ class String(Field):
     
     
     # TODO: Fix this for Python 3.
-    _valueClasses = (str, str)
+    _valueClasses = (str, unicode)
     
     
     def __init__(self, **kwds):
@@ -239,7 +239,7 @@ class String(Field):
     def _initTranslations(self, translations):
         
         if translations is not None:
-            for value in translations.values():
+            for value in translations.itervalues():
                 self._rangeCheck(value, 'translation')
                 
         self._translations = translations
@@ -492,7 +492,7 @@ class Decimal(Field):
 
     
     # TODO: Fix this for Python 3.
-    _valueClasses = (str, str)
+    _valueClasses = (str, unicode)
     
     
     def __init__(self, **kwds):

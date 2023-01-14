@@ -1,7 +1,7 @@
 '''Module containing Maka preferences.'''
 
 
-
+from __future__ import print_function
 import json
 
 import maka.util.TextUtils as TextUtils
