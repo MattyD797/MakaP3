@@ -5,10 +5,10 @@
 
 import os.path
 
-from PySide2.QtCore import SIGNAL
+from PySide2.QtCore import SIGNAL, QItemSelection, QItemSelectionModel
 from PySide2.QtWidgets import (
     QAbstractItemView, QAction, QApplication, QDialog, QFileDialog, QHBoxLayout,
-    QItemSelection, QItemSelectionModel, QLabel, QLineEdit, QListWidget, QMainWindow,
+    QLabel, QLineEdit, QListWidget, QMainWindow,
     QMenuBar, QMessageBox, QVBoxLayout, QWidget)
 
 from maka.command.CommandInterpreterError import CommandInterpreterError
